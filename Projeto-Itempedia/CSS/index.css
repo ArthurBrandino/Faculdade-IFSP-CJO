@@ -1,0 +1,560 @@
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+    z-index: 150;
+    border: 0px;
+    height: 100px;
+    
+    display: flex;
+    align-items: center; 
+    flex-direction: row;
+    padding: 0px 0px;
+    justify-content: space-between;
+    
+    min-height: 70px;
+    background-color: #333; /*cor de fundo do cabecalho*/
+
+    .logo{
+        display: flex;
+        align-items: center;
+        padding-left: 20px;
+    }
+
+    .logo-nome{
+        font-size: 30px;
+    }
+
+    .logo-img{
+        height: 100px;
+        margin-right: 15px;
+    }
+    
+    .nav-link{
+        margin-right: 3dvi;
+    }
+
+    a:hover{
+        color: #ffd900; 
+    }
+}
+
+
+.navegacao{
+    padding-top: 100px;
+    position: fixed;
+    top: 0;
+    height: 90vh;
+    width: 50px;
+    background-color: #1e4072;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    border-left: 4px solid #816e00;
+
+    z-index: 2;
+
+    a {
+        font-size: 13.5px;
+        padding: 7px 0;
+        color:  #ffd900;
+        text-decoration: none;
+        font-weight: bold;
+        text-align: center;
+        display: block;
+        width: 100%;
+    }
+    a:hover {
+            background-color: #4e7abb;
+            color: white;
+            border-radius: 4px;
+        }
+}
+
+.tabela{
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+body{
+    padding-top: 100px; 
+    color: #ffffff;
+    background-image: url(../Imagens/Logo.webp); /* Caminho da imagem */
+    background-repeat: no-repeat; /* Repete a imagem horizontal e verticalmente */
+    background-attachment: fixed; /* A imagem permanece fixa enquanto rola */
+    background-size: auto; /* Mantém o tamanho original da imagem */
+    background-size: 500px;
+    background-position: center;
+    position: relative;
+    background-color: #1b2a3f;
+    scroll-padding-top: 100px;
+    
+}
+ /* Sobreposição */
+ body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #1b2a3fd0;
+    z-index: 1;
+    
+}
+
+.Secoes {
+    display: flex;
+    justify-content: space-around;
+    align-items: self-start;
+    flex-wrap: wrap;
+    gap: 20px;
+    position: relative;
+    z-index: 2;
+    margin-right: 25px;
+    padding: 20px;
+    flex-grow: 1;
+ 
+    img {
+        transition: filter 0.3s ease; /* Animação suave */
+    }
+
+    table{
+        border: 5px solid #816e00;
+        min-width: 200px; 
+        padding: 10px;
+        border-collapse: collapse;
+        margin: 10px;
+    }
+    th{
+        color: #c4ac27;
+        background-color: #1e4072
+    }
+    td{
+        background-color: #2b4264;
+    }
+   
+    td:hover{
+            background-color: #4e7abb; /* Cor de fundo ao passar o mouse */
+        a {
+            color: #c2b04a; /* Define a cor inicial do link */
+            text-decoration: none;
+        }
+         /* Quando o mouse passa por cima */
+        img {
+            filter: brightness(1.5); /* Aumenta o brilho para 130% */
+        }
+    } 
+}
+
+.ancora {
+    scroll-margin-top: 120px;
+
+}
+
+
+a {
+    color: rgb(255, 255, 255); /* Define a cor inicial do link */
+    text-decoration: none;
+}
+
+td a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    color:rgb(255, 255, 255);
+    text-align: center;
+}
+h1{
+    text-align: center;
+}
+
+p{
+    text-align: center;
+}
+
+/*Centraliza a Categoria*/
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/*Formatacao dos Niveis de qualidade*/
+.Categoria{
+    flex-direction: column;
+    display: flex;
+    align-items: center;
+    font-size: larger;
+    position: relative;
+    z-index: 2;
+    background-color: #1e4072;
+    border: 4px solid #816e00;
+    width: 300px;
+    height: 200px;
+
+}
+html {
+    scroll-behavior: smooth;
+}
+
+footer{
+    position: relative;
+    z-index: 2;
+}
+
+.rodape {
+    background-color: #1a1a1a;
+    color: #fff;
+    padding: 20px 0;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+.rodape .container {
+    display: flex;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+}
+
+.rodape-secao {
+    flex: 1;
+    margin: 30px;
+    min-width: 200px;
+    .open-modal-btn p:hover{
+        color: #ffd900;;
+    }
+}
+
+.rodape-secao h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.rodape-secao p, .rodape-secao ul, .rodape-secao a {
+    color: #ccc;
+    text-decoration: none;
+}
+
+.rodape-secao ul {
+    list-style: none;
+    padding: 0;
+}
+
+.rodape-secao ul li {
+    margin-bottom: 5px;
+}
+
+.rodape-secao ul li a:hover {
+    color: #ffd900;
+}
+
+.rodape-copyright {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 12px;
+    color: #aaa;
+}
+
+
+/* Botão para abrir o modal */
+.open-modal-btn {
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* Estilos do modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    color: #1a1a1a;
+    backdrop-filter: blur(1.5px);
+}
+
+/* Modal visível quando checkbox está marcado */
+#modal-toggle:checked + .modal-overlay {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Conteúdo do modal */
+.modal-content {
+    background: #fff;
+    padding: 20px;
+    width: 400px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+}
+
+.modal-content label {
+    display: block;
+    text-align: start;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.modal-content input[type="text"],
+.modal-content input[type="email"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.modal-content button {
+    margin-left: 160px;
+    padding: 8px 16px;
+    background: #333;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+.modal-content button:hover {
+    margin-left: 160px;
+    padding: 8px 16px;
+    background: #128729;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transform: scale(1.1); /* Aumenta o tamanho do contêiner */
+    filter: brightness(1.2);/* Aumenta o Brilho */
+}
+
+
+.close-modal {
+    display: block;
+    margin-top: 15px;
+    text-decoration: underline;
+    cursor: pointer;
+    color: #333;
+}
+
+.close-modal:hover {
+    display: block;
+    margin-top: 15px;
+    text-decoration: underline;
+    cursor: pointer;
+    color: #ff3232;
+}
+
+
+#descricao {       
+    width: 390px;    /* Define uma largura máxima */
+    height: 150px;       /* Altura para várias linhas */
+    padding: 10px;       /* Espaçamento interno */
+    font-size: 16px;     /* Aumenta o tamanho do texto */
+    border-radius: 5px;  /* Arredonda as bordas */
+    border: 1px solid #ccc; /* Borda fina */
+    resize: vertical;
+}
+
+
+@media (max-width: 1080px){
+    .navegacao{
+        a {
+            font-size: 10px;
+        }
+    }
+    .rodape .container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .rodape-secao {
+        margin: 20px 0;
+    }
+}
+
+/*Celulares e Alguns Tablets*/
+@media (min-width: 768px) and (max-width: 991.98px){
+    header{
+        
+        .logo-nome{
+            font-size: 20px;
+        }
+
+    }
+    .rodape .container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .rodape-secao {
+        text-align: center;
+        margin: 15px 0;
+    }
+
+    .modal-content {
+        width: 90%;
+    }
+}
+
+/*Celulares Menores*/
+@media (max-width: 767.98px){
+    header{
+        
+        .logo{
+            padding-left: 20px;
+        }
+
+        .logo-nome{
+            font-size: 4dvi;
+        }
+
+        .logo-img{
+            width: 20dvi;
+            height: 20dvi;
+        }
+        
+        nav{
+            font-size: 3dvi;
+            padding-right: 3dvi;
+        }
+
+        .nav-link{
+            margin-right: 3dvi;
+        }
+    }
+    .navegacao{   
+        width: 40px;
+    }
+    .rodape .container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .rodape-secao {
+        margin: 10px 0;
+        align-items: center;
+    }
+
+    .modal-content {
+        width: 90%;
+    }
+
+    .modal-content button {
+        margin-left: 0; /* Ajuste para centralizar o botão no modal */
+        width: 100%;
+    }
+    .modal-content button:hover {
+        margin-left: 0; /* Ajuste para centralizar o botão no modal */
+        width: 100%;
+    }
+
+    .close-modal {
+        text-align: center;
+    }
+}
+
+
+@media (max-width: 376px){
+    img{
+        width: 40px;
+        height: 40px;
+    }
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        margin-right: 30px;
+    }
+    .navegacao{   
+        width: 30px;
+    }
+    .Secoes{
+        margin-right:15px;
+    }
+    .Categoria{
+        width: 200px;
+        height: 125px;
+        font-size: 12px;
+    }
+    header{
+        .logo-img{
+            width: 15dvi;
+            height: 15dvi;
+        }
+        .nav-link{
+
+            font-size: 4dvi;
+        }
+    }
+    .rodape .container {
+        flex-direction: column;
+        align-items: center;
+        width: 20px;
+    }
+   
+    .rodape-secao {
+        margin: 10px 0;
+    }
+
+    .modal-content {
+        width: 90%;
+    }
+
+    .modal-content button {
+        width: 100%;
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 320px){
+    .Secoes{
+        margin-right:17px;
+        font-size: small;
+    }
+    .navegacao{   
+        width: 40px;
+    }
+    .rodape .container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .rodape-secao {
+        margin: 8px 0;
+        padding: 0 10px;
+    }
+
+    .modal-content {
+        width: 95%;
+    }
+
+    .modal-content h2 {
+        font-size: 18px;
+    }
+
+    .modal-content label,
+    .modal-content input,
+    .modal-content textarea,
+    .modal-content button {
+        width: 100%;
+    }
+}

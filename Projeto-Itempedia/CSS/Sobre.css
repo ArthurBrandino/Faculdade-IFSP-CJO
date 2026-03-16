@@ -1,0 +1,702 @@
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+    z-index: 150;
+    border: 0px;
+    height: 100px;
+    
+    display: flex;
+    align-items: center; 
+    flex-direction: row;
+    padding: 0px 0px;
+    justify-content: space-between;
+    
+    min-height: 70px;
+    background-color: #333; /*cor de fundo do cabecalho*/
+
+    .logo{
+        display: flex;
+        align-items: center;
+        padding-left: 20px;
+    }
+
+    .logo-nome{
+        font-size: 30px;
+    }
+
+    .logo-img{
+        height: 100px;
+        margin-right: 15px;
+    }
+    
+    nav{
+        display: flex;
+        flex-direction: row;
+        padding-bottom: 5px;
+        padding-right: 50px;
+    }
+
+    .nav-link{
+        margin-right: 50px;
+    }
+
+    nav a{
+        padding-left: 10px;
+    }
+
+    nav a:hover{
+        color: #ffd900; 
+    }
+}
+body{
+    padding-top: 100px; 
+    color: #ffffff;
+    background-image: url(../Imagens/Logo.webp); /* Caminho da imagem */
+    background-repeat: no-repeat; /* Repete a imagem horizontal e verticalmente */
+    background-attachment: fixed; /* A imagem permanece fixa enquanto rola */
+    background-size: auto; /* Mantém o tamanho original da imagem */
+    background-size: 500px;
+    background-position: center;
+    position: relative;
+    background-color: #1b2a3f;
+    scroll-padding-top: 100px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+ /* Sobreposição */
+ body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #1b2a3fd0;
+    z-index: 1;
+    
+}
+a{
+    text-decoration: none;
+    color: #ffffff;
+}
+
+.prazer{
+    display: flex;
+    align-items: center; /* Alinha verticalmente o texto e a imagem */
+    justify-content: space-between;
+    padding: 20px;
+    width: 900px;
+    height: 150px;
+    margin: auto;
+    font-family: Arial, sans-serif;
+    z-index: 2;
+    font-size: medium;
+    border: 10px solid #8d7c19 ;
+    background-color: #3c5d8e;
+    transition: transform 0.3s ease, filter 0.3s ease;
+    img{
+        width: 150px;
+        height: auto;
+        border-radius: 50%;
+    }
+    .texto {
+        flex: 1;
+        margin-left: 20px; /* Espaçamento entre o texto e a imagem */
+        text-align: center;
+        h1{
+            text-align: start;
+        }
+        
+    }
+}
+.prazer:hover{
+    display: flex;
+    align-items: center; /* Alinha verticalmente o texto e a imagem */
+    justify-content: space-between;
+    padding: 20px;
+    width: 900px;
+    height: 150px;
+    margin: auto;
+    font-family: Arial, sans-serif;
+    z-index: 2;
+    font-size: medium;
+    border: 10px solid #8d7c19 ;
+    background-color: #3c5d8e;
+    transform: scale(1.1); /* Aumenta o tamanho do contêiner */
+    filter: brightness(1.2);/* Aumenta o Brilho */
+    img{
+        width: 150px;
+        height: auto;
+        border-radius: 50%;
+    }
+    .texto {
+        flex: 1;
+        margin-left: 20px; /* Espaçamento entre o texto e a imagem */
+        text-align: center;
+        h1{
+            text-align: start;
+        }
+        
+    }
+}
+
+.oque{
+    padding: 20px;
+    width: 500px;
+    margin: auto;
+    font-family: Arial, sans-serif;
+    border: 15px solid rgb(80, 39, 10);
+    border-radius: 10px;
+    background-image: url(../Imagens/madeira.png);
+    text-align: center;
+    text-shadow: 
+    -2px -2px 2px #000,
+    2px -2px 2px #000,
+   -2px  2px 2px #000,
+    2px  2px 2px #000,
+   0px  0px 5px #000;
+   transition: transform 0.3s ease, filter 0.3s ease;
+}
+.oque:hover{
+    padding: 20px;
+    width: 500px;
+    margin: auto;
+    font-family: Arial, sans-serif;
+    border: 15px solid rgb(80, 39, 10);
+    border-radius: 10px;
+    background-image: url(../Imagens/madeira.png);
+    text-align: center;
+    text-shadow: 
+    -2px -2px 2px #000,
+    2px -2px 2px #000,
+   -2px  2px 2px #000,
+    2px  2px 2px #000,
+    0px  0px 5px #000;
+    transform: scale(1.1); /* Aumenta o tamanho do contêiner */
+    filter: brightness(1.2);/* Aumenta o Brilho */
+    a{
+        color: #fbeb8c;
+        
+    }
+   
+    a:hover{
+        color: #ffd900;
+        text-shadow: 
+        -1px -1px 0 #8d7c19,  
+        1px -1px 0 #8d7c19,
+        -1px  1px 0 #8d7c19,
+        1px  1px 0 #8d7c19;
+    }
+}
+
+.objetivo{
+    width: 600px;
+    font-family: Arial, sans-serif;
+    border: 10px solid #007071 ;
+    background-image: url(../Imagens/nuvens.png);
+    flex: 1;
+    margin-left: 20px; /* Espaçamento entre o texto e a imagem */
+    text-align: center;
+    border-radius: 10px;
+    text-shadow: 
+    -2px -2px 2px #000,
+    2px -2px 2px #000,
+   -2px  2px 2px #000,
+    2px  2px 2px #000,
+   0px  0px 5px #000;
+   transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.objetivo:hover{
+    width: 600px;
+    font-family: Arial, sans-serif;
+    border: 10px solid #007071 ;
+    background-image: url(../Imagens/nuvens.png);
+    flex: 1;
+    margin-left: 20px; /* Espaçamento entre o texto e a imagem */
+    text-align: center;
+    border-radius: 10px;
+    text-shadow: 
+    -2px -2px 2px #000,
+    2px -2px 2px #000,
+   -2px  2px 2px #000,
+    2px  2px 2px #000,
+   0px  0px 5px #000;
+   transform: scale(1.1); /* Aumenta o tamanho do contêiner */
+    filter: brightness(1.2);/* Aumenta o Brilho */
+}
+
+.organizar{
+    z-index: 2;
+    display: flex ;
+    flex-direction: row;
+}
+
+.empresa{
+    padding: 20px;
+    max-width: 900px;
+    margin: auto;
+    font-family: Arial, sans-serif;
+    border: 15px solid rgb(37, 14, 58);
+    border-radius: 10px;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-image: url(../Imagens/City.jpg);
+    text-align: center;
+    z-index: 2;
+    text-shadow: 
+    -2px -2px 2px #000,
+    2px -2px 2px #000,
+   -2px  2px 2px #000,
+    2px  2px 2px #000,
+   0px  0px 5px #000;
+    transition: transform 0.3s ease, filter 0.3s ease;
+    
+}
+
+.empresa:hover{
+    transform: scale(1.1); /* Aumenta o tamanho do contêiner */
+    filter: brightness(1.2);/* Aumenta o Brilho */
+}
+
+.curiosidades{
+    padding: 20px;
+    max-width: 900px;
+    margin: auto;
+    font-family: Arial, sans-serif;
+    border: 15px solid rgb(37, 14, 58);
+    border-radius: 10px;
+    background-image: url(../Imagens/estrelas.jpeg);
+    text-align: center;
+    z-index: 2;
+    text-shadow: 
+    -2px -2px 0 #000,
+    2px -2px 0 #000,
+    -2px  2px 0 #000,
+    2px  2px 0 #000,
+    -3px -3px 0 #000,
+    3px -3px 0 #000,
+    -3px  3px 0 #000,
+    3px  3px 0 #000;
+    transition: transform 0.3s ease, filter 0.3s ease;
+    p{
+        background-color: #361f35;
+        
+    }
+}
+
+.curiosidades:hover{
+    padding: 20px;
+    max-width: 900px;
+    margin: auto;
+    font-family: Arial, sans-serif;
+    border: 15px solid rgb(37, 14, 58);
+    border-radius: 10px;
+    background-image: url(../Imagens/estrelas.jpeg);
+    text-align: center;
+    z-index: 2;
+    text-shadow: 
+    -2px -2px 0 #000,
+    2px -2px 0 #000,
+    -2px  2px 0 #000,
+    2px  2px 0 #000,
+    -3px -3px 0 #000,
+    3px -3px 0 #000,
+    -3px  3px 0 #000,
+    3px  3px 0 #000;
+    transform: scale(1.1); /* Aumenta o tamanho do contêiner */
+    filter: brightness(1.2);/* Aumenta o Brilho */
+    p{
+        background-color: #361f35;
+        
+    }
+}
+
+
+.desenvolvedor {
+    padding: 20px;
+    width: 450px;
+    margin: 25px;
+    font-family: Arial, sans-serif;
+    position: relative;
+    text-align: center;
+    z-index: 2;
+    text-shadow: 
+    -2px -2px 2px #000,
+    2px -2px 2px #000,
+    -2px  2px 2px #000,
+    2px  2px 2px #000,
+    0px  0px 5px #000;
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+.desenvolvedor:hover {
+    padding: 20px;
+    width: 450px;
+    margin: 25px;
+    font-family: Arial, sans-serif;
+    position: relative;
+    text-align: center;
+    z-index: 2;
+    text-shadow: 
+    -2px -2px 2px #000,
+    2px -2px 2px #000,
+    -2px  2px 2px #000,
+    2px  2px 2px #000,
+    0px  0px 5px #000;
+    transform: scale(1.1); /* Aumenta o tamanho do contêiner */
+    filter: brightness(1.2);/* Aumenta o Brilho */
+
+    a{
+        color: #fbeb8c;
+        
+    }
+   
+    a:hover{
+        color: #ffd900;
+        text-shadow: 
+        -1px -1px 0 #8d7c19,  
+        1px -1px 0 #8d7c19,
+        -1px  1px 0 #8d7c19,
+        1px  1px 0 #8d7c19;
+    }
+}
+
+/* Estado normal: exibe a imagem estática */
+.desenvolvedor::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 270px;
+    height: 600px;
+    background-image: url(../Imagens/portal1frame.png); /* Imagem estática que simula o primeiro frame do GIF */
+    background-size: cover;
+    background-position: center;
+    transform: translate(-50%, -50%) rotate(90deg);
+    z-index: -1;
+    border-radius: 50px;
+    transition: background-image 0.3s ease; /* Transição suave */
+}
+
+/* Ao passar o mouse, troca para o GIF */
+.desenvolvedor:hover::before {
+    background-image: url(../Imagens/nether-portal-minecraft.gif); /* O GIF real */
+}
+
+.mensagem{
+    z-index: 2;
+    color: red;
+} 
+footer{
+    position: relative;
+    z-index: 2;
+    width: 100%;
+}
+
+.rodape {
+    background-color: #1a1a1a;
+    color: #fff;
+    padding: 20px 0;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+.rodape .container {
+    display: flex;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+}
+
+.rodape-secao {
+    flex: 1;
+    margin: 30px;
+    min-width: 200px;
+    .open-modal-btn p:hover{
+        color: #ffd900;;
+    }
+}
+
+.rodape-secao h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.rodape-secao p, .rodape-secao ul, .rodape-secao a {
+    color: #ccc;
+    text-decoration: none;
+}
+
+.rodape-secao ul {
+    list-style: none;
+    padding: 0;
+}
+
+.rodape-secao ul li {
+    margin-bottom: 5px;
+}
+
+.rodape-secao ul li a:hover {
+    color: #ffd900;
+}
+
+.rodape-copyright {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 12px;
+    color: #aaa;
+}
+
+
+/* Botão para abrir o modal */
+.open-modal-btn {
+    font-size: 16px;
+    cursor: pointer;
+}
+
+/* Estilos do modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    color: #1a1a1a;
+    backdrop-filter: blur(1.5px);
+}
+
+/* Modal visível quando checkbox está marcado */
+#modal-toggle:checked + .modal-overlay {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Conteúdo do modal */
+.modal-content {
+    background: #fff;
+    padding: 20px;
+    width: 400px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+}
+
+.modal-content label {
+    display: block;
+    text-align: start;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.modal-content input[type="text"],
+.modal-content input[type="email"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.modal-content button {
+    margin-left: 160px;
+    padding: 8px 16px;
+    background: #333;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.3s ease, filter 0.3s ease;
+}
+.modal-content button:hover {
+    margin-left: 160px;
+    padding: 8px 16px;
+    background: #128729;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transform: scale(1.1); /* Aumenta o tamanho do contêiner */
+    filter: brightness(1.2);/* Aumenta o Brilho */
+}
+
+
+.close-modal {
+    display: block;
+    margin-top: 15px;
+    text-decoration: underline;
+    cursor: pointer;
+    color: #333;
+}
+
+.close-modal:hover {
+    display: block;
+    margin-top: 15px;
+    text-decoration: underline;
+    cursor: pointer;
+    color: #ff3232;
+}
+
+
+#descricao {       
+    width: 390px;    /* Define uma largura máxima */
+    height: 150px;       /* Altura para várias linhas */
+    padding: 10px;       /* Espaçamento interno */
+    font-size: 16px;     /* Aumenta o tamanho do texto */
+    border-radius: 5px;  /* Arredonda as bordas */
+    border: 1px solid #ccc; /* Borda fina */
+    resize: vertical;
+}
+
+/*Tablets*/
+@media (max-width: 1199.9px) and (max-height: 1200px){
+    body{
+        padding-top: 120px; 
+    }
+    .prazer{
+       flex-direction: column;
+       width: 500px;
+        height: 350px;
+        font-size: large;
+        img{
+            width: 150px;
+        }
+        .texto h1{
+                text-align: center;
+        }
+    }
+    .prazer:hover{
+        flex-direction: column;
+        width: 500px;
+        height: 350px;
+        font-size: large;
+        img{
+            width: 150px;
+        }
+        .texto h1{
+                text-align: center;
+        }
+    }
+    
+    .oque{
+        width: 280px;
+    }
+    .oque:hover{
+        width: 280px;
+    }
+    
+    .objetivo{
+        width: 390px;
+    }
+    
+    .objetivo:hover{
+        width: 390px;
+    }
+    .curiosidades{
+        width: 700px; 
+    }
+    
+    .curiosidades:hover{
+        width: 700px;
+    }
+
+    .desenvolvedor::before {
+        background-image: url(../Imagens/nether-portal-minecraft.gif); 
+    }
+}
+
+/*Celulares e Alguns Tablets*/
+@media (max-width: 800px) and (max-height:1100px){
+            
+    .prazer{
+        width: 300px;
+        height: 400px;
+        font-size: medium;
+    }
+    .prazer:hover{
+        width: 300px;
+        height: 400px;
+        font-size: medium;
+        img{
+            width: 150px;
+        }
+        .texto h1{
+                text-align: center;
+        }
+        z-index: 3;
+    }
+    .organizar{
+        flex-direction: column;
+    }
+    
+    .objetivo{
+        width: 330px;
+        font-size: small;
+        margin-left: 0px
+    }
+    
+    .objetivo:hover{
+        width: 330px;
+        margin-left: 0px
+    }
+    .curiosidades{
+        width: 300px; 
+        font-size: small;
+    }
+    
+    .curiosidades:hover{
+        width: 300px;
+    }
+
+    .desenvolvedor{
+        width: 400px;
+        font-size: small;
+    }
+    .desenvolvedor::before{
+        width: 250px;
+        height: 400px;
+    }
+    
+}
+
+/*Celulares Menores*/
+@media (max-width: 767.98px){
+    header{
+        .logo{
+            padding-left: 20px;
+        }
+
+        .logo-nome{
+            font-size: 14px;
+        }
+
+        .logo-img{
+            height: 15dvi;
+        }
+        
+        nav{
+            font-size: 12;
+            padding-right: 3dvi;
+        }
+
+        .nav-link{
+            margin-right: 3dvi;
+        }
+    }
+}

@@ -1,0 +1,280 @@
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+    z-index: 150;
+    border: 0px;
+    height: 100px;
+    
+    display: flex;
+    align-items: center; 
+    flex-direction: row;
+    padding: 0px 0px;
+    justify-content: space-between;
+    
+    min-height: 70px;
+    background-color: #333; /*cor de fundo do cabecalho*/
+
+    .logo{
+        display: flex;
+        align-items: center;
+        padding-left: 20px;
+    }
+
+    .logo-nome{
+        font-size: 30px;
+    }
+
+    .logo-img{
+        height: 100px;
+        margin-right: 15px;
+    }
+    
+    nav{
+        display: flex;
+        flex-direction: row;
+        padding-bottom: 5px;
+        padding-right: 50px;
+    }
+
+    .nav-link{
+        margin-right: 50px;
+    }
+
+    nav a{
+        padding-left: 10px;
+    }
+
+    nav a:hover{
+        color: #ffd900; 
+    }
+}
+
+
+body{
+    padding-top: 120px; ;
+    color: #ffffff;
+    background-image: url(../Imagens/Logo.webp); /* Caminho da imagem */
+    background-repeat: no-repeat; /* Repete a imagem horizontal e verticalmente */
+    background-attachment: fixed; /* A imagem permanece fixa enquanto rola */
+    background-size: 500px;
+    background-position: center;
+    position: relative;
+    background-color: #1b2a3f;
+    scroll-padding-top: 100px
+}
+ /* Sobreposição */
+ body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #1b2a3fd0;
+    z-index: 1;
+}
+
+.Secoes{
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-start; 
+    position: relative;
+    z-index: 2;
+    
+    table{
+        border-collapse: collapse;
+        margin: 10px;
+        text-align: center;
+        padding: -1px;
+        border: 5px solid #816e00;
+        min-width: 300px;
+    }
+    th{
+        color: #c4ac27;
+        background-color: #2f5081
+    }
+    td{
+        background-color: #3d506b;   
+    }
+    td a {
+        display: block;
+        width: 100%;
+        height: 100%;
+        text-decoration: none;
+        color:rgb(255, 255, 255);
+        text-align: center;
+    } 
+       
+            
+}
+
+.principal{
+    td{
+        width: 275px;
+    }
+}
+
+.tabela{
+    display: flex;
+    justify-content: space-around;
+    flex-direction: column;
+
+    td{
+        min-width: 300px;
+    }
+
+    td:hover{
+        background-color: #4e7abb; /* Cor de fundo ao passar o mouse */
+    a {
+        color: #c2b04a; /* Define a cor inicial do link */
+        text-decoration: none;
+    }
+     /* Quando o mouse passa por cima */
+    img {
+        filter: brightness(1.5); /* Aumenta o brilho para 150% */
+    }
+}
+}
+
+.receita{
+    display: flex;
+    justify-content: center;
+
+    td{
+        padding: 0% 0%;
+        min-width: 0%;
+    }
+
+}
+
+a {
+    color: rgb(255, 255, 255); /* Define a cor inicial do link */
+    text-decoration: none;
+}
+
+@media (max-width: 992px) and (max-width: 1199.9px){
+    .tabela{
+        h2{
+            font-size: 2dvi;
+        }
+        td{
+            min-width: 100px;
+        }
+    }
+    .receita td{
+        min-width: 0%;
+    }
+}
+
+/*Tablets*/
+@media (min-width: 992px) and (max-width: 1199.9px){
+    .tabela{
+        h2{
+            font-size: 2dvi;
+        }
+        td{
+            min-width: 100px;
+        }
+    }
+    .receita td{
+        min-width: 0%;
+    }
+}
+
+/*Celulares e Alguns Tablets*/
+@media (min-width: 768px) and (max-width: 991.98px){
+    header{
+        .logo-nome{
+            font-size: 20px;
+        }
+
+    }
+    .Secoes{
+        flex-direction: column;
+        align-items: center;
+    }
+    .tabela{
+        
+        flex-direction: row;
+        
+        td{
+            min-width: 110px;
+        }
+    }
+    .receita {
+        table{
+            max-height: 0%;
+        }
+        td{
+            min-width: 0%;
+        }
+    }
+}
+
+/*Celulares Menores*/
+@media (max-width: 767.98px){
+    header{
+        .logo{
+            padding-left: 20px;
+        }
+
+        .logo-nome{
+            font-size: 3dvi;
+        }
+
+        .logo-img{
+            height: 15dvi;
+        }
+        
+        nav{
+            font-size: 3dvi;
+            padding-right: 3dvi;
+        }
+
+        .nav-link{
+            margin-right: 3dvi;
+        }
+    }
+    .Secoes{
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        td{
+            padding:  1dvi;
+        }
+    }
+    .principal{
+        img{
+            width: 60px;
+            height: 60px;
+        }
+    }
+    .tabela{
+        flex-direction: column;
+        img{
+            width: 10dvi;
+            height: 10dvi;
+        }
+        h2{
+            font-size:15px ;
+        }
+        td{
+            min-width: 8dvi;
+        }
+    }
+    .receita {
+        
+        td{
+            min-width: 0%;
+        }
+    }
+}
+
+
+
+
