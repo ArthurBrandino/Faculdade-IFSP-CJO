@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="UTF-8">
+	<title>Formulário</title>
+	<link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+	<section>
+		<h1>Cadastro no Curso de Extensão</h1>
+		<form action="LoginAluno" method="post">
+			<label for="name">Nome:</label>
+			<input type="text" name="name" id="name" required>
+			
+			<label for="email">E-mail:</label>
+			<input type="email" name="email" id="email" required>
+			
+			<fieldset>
+				<legend>Selecione os Cursos de Seu Interesse</legend>
+				
+				<input type="checkbox" name="cursos" id="bootstrap" value="Bootstrap">
+				<label for="bootstrap">Bootstrap</label><br>
+				
+				<input type="checkbox" name="cursos" id="css3" value="CSS3">
+				<label for="css3">Animações em CSS 3</label><br>
+				
+				<input type="checkbox" name="cursos" id="patterns" value="Patterns">
+				<label for="patterns">Design Patterns</label><br>
+			</fieldset>
+			
+			<input type="submit" value="Enviar">
+		</form>
+	</section>
+</body>
+</html>
