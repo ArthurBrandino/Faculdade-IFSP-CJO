@@ -299,10 +299,56 @@ void Ex20(){
     cout << A << " >> " << B << " >> " << C << endl;
 }
 
+void Ex21(){
+    cout << "Programa Saudacao por Turno" << endl << endl;
+    char N;
+    cout << "Entre com o Turno em que voce Estuda. <M> Matutino - <V> Vespertino - <N> Noturno: "; cin >> N;
+    N = toupper(N);
+
+    switch (N){
+        case 'M' : cout << "Bom dia!" << endl; break;
+        case 'V' : cout << "Boa Tarde!" << endl; break;
+        case 'N' : cout << "Boa Noite!" << endl; break;
+        default : cout << "Valor Invalido!" << endl;
+    };
+}
+
+void Ex22(){
+    cout << "Programa Sistema de Notas Escolares" << endl << endl;
+    double N1, N2, M;
+    char Conceito;
+    string Situacao;
+
+    do{
+        cout << "Entre com o Valor da <Nota 1>: "; cin >> N1;
+    }while(N1 < 0 || N1>10);
+    do{
+        cout << "Entre com o Valor da <Nota 2>: "; cin >> N2;
+    }while(N2 < 0 && N2 > 10);
+
+    M = (N1 + N2)/2;
+
+    if(M >= 9 && M <= 10) Conceito = 'A';
+    else if (M >= 7.5 && M < 9) Conceito = 'B';
+    else if (M >= 6 && M < 7.5) Conceito = 'C';
+    else if (M >= 4 && M < 6) Conceito = 'D';
+    else  Conceito = 'E';
+
+    (Conceito == 'A' || Conceito == 'B' || Conceito == 'C') ?  Situacao = "Aprovado!" : Situacao = "Repovado!";
+
+
+    cout << left << setw(6) << "N1" << setw(6) << "N2" << setw(25) << "Media de Aproveitamento" << setw(11) << "Conceito" << setw(14) << "Situacao" << endl;
+    cout << left << setw(6) << fixed << setprecision(1) << N1 << setw(6) << N2;
+    cout << right << setw(15) << M;
+    cout << left << setw(10) << "";
+    cout << right << setw(4) << Conceito; 
+    cout << left << setw(7) << "" << setw(14) << Situacao << endl;
+
+}
 
 int main(){
 
-    Ex20();
+    Ex22();
     
     cout << "Tecle <Enter> para Encerrar...";
     cin.ignore();
