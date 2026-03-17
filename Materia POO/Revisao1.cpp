@@ -310,7 +310,7 @@ void Ex21(){
         case 'V' : cout << "Boa Tarde!" << endl; break;
         case 'N' : cout << "Boa Noite!" << endl; break;
         default : cout << "Valor Invalido!" << endl;
-    };
+    }
 }
 
 void Ex22(){
@@ -346,9 +346,119 @@ void Ex22(){
 
 }
 
+void Ex23(){
+    cout << "Programa: Decompositor de Numeros" << endl << endl;
+   
+    int N, C, D, U, X;
+    do{
+        cout << "Entre com um numero de 0 a 999: "; cin >> N;
+        if (N >= 1000 || N  < 0) cout << "Numero Invalido! " << endl;
+    }while(N >= 1000 || N  < 0);
+
+    C = N / 100;
+    X = N % 100;
+    D = X / 10;
+    X = X % 10;
+    U = X;
+
+    cout << "O Numero " << N << " Decomposto e: ";
+    if(C != 0)  (C == 1) ? cout << C << " centena" : cout << C << " centenas";
+    if(D != 0 && U != 0 && C != 0) cout << ", ";
+    else if((D != 0 && C != 0)) cout << " e ";
+
+    if(D != 0)  (D == 1) ? cout << D << " dezena" : cout << D << " dezenas";
+    if(U != 0 && D != 0) cout << " e ";
+
+    if(U != 0)  (U == 1) ? cout << U << " unidade" : cout << U << " unidades";
+
+    cout << '.' << endl;
+    
+}
+
+void Ex24(){
+    cout << "Programa: Verificacao de Paridade" << endl << endl;
+    int N;
+    cout << "Entre com um Numero: "; cin >> N;
+
+    (0 == N % 2)? cout << "O Numero " << N << " e Par!" : cout << "O Numero " << N << " e Impar!";
+    cout << endl;
+}
+void pedirRespostaEx25(string pergunta, int &contador)
+{
+    char resposta;
+    while(true){
+        cout << pergunta; cin >> resposta;
+        resposta = toupper(resposta);
+        if(resposta != 'S' && resposta != 'N') cout << "Resposta Invalida!" << endl;
+        else break;
+    }
+    if(resposta == 'S') contador++;
+}
+
+void Ex25(){
+    cout << "Programa: Investigador de Crime" << endl << endl;
+    char resposta;
+    int contador = 0;
+
+    string pergunta1 = "1. Telefonou para a vitima?   (S/N): "; 
+    string pergunta2 = "2. Esteve no local do crime?  (S/N): "; 
+    string pergunta3 = "3. Mora perto da vitima?      (S/N): "; 
+    string pergunta4 = "4. Devia para a vitima?       (S/N): "; 
+    string pergunta5 = "5. Já trabalhou com a vitima? (S/N): "; 
+
+    cout << "---------------------------------------------------------------------------" << endl;
+    cout << "Por favor, colha o depoimento do suspeito e responda as perguntas a seguir." << endl;
+    cout << "---------------------------------------------------------------------------" << endl;
+    pedirRespostaEx25(pergunta1, contador);
+    pedirRespostaEx25(pergunta2, contador);
+    pedirRespostaEx25(pergunta3, contador);
+    pedirRespostaEx25(pergunta4, contador);
+    pedirRespostaEx25(pergunta5, contador);
+
+    switch(contador){
+        case 2 : cout << "O individuo e considerado Suspeito"; break;
+        case 3 : 
+        case 4 : cout << "O individuo e considerado Cumplice"; break;
+        case 5 : cout << "O individuo e considerado Assasino"; break;
+        default : cout << "O individuo e considerado Inocente"; break;
+    }
+    cout << endl;
+}
+
+void Ex26(){
+    cout << "Programa: Localizador de Menor Preço" << endl << endl;
+    struct Produto{
+        string nome;
+        float valor;
+    };
+    Produto Produtos[3];
+    int menor = 0;
+    
+   for (int i = 0; i < 3; i++)
+   {
+        cout << "Entre com o Nome do Produto <" << i+1 << ">: "; cin >> Produtos[i].nome;
+        while(true){
+            cout << "Entre com o Valor do Produto <" << i+1 << ">: ";
+            if(cin >> Produtos[i].valor && Produtos[i].valor > 0) break;
+            else {
+                cout <<"Valor Invalido!" << endl;
+                cin.clear(); 
+                cin.ignore(1000, '\n');
+            }
+        }
+   }
+
+    for (int i = 1; i < 3; i++)
+    {
+        if (Produtos[i].valor < Produtos[menor].valor) menor = i ;
+    }
+
+    cout << "O Produto mais barato e: "  << Produtos[menor].nome << " R$ " << fixed << setprecision(2) << Produtos[menor].valor << endl; 
+}
+
 int main(){
 
-    Ex22();
+    Ex26();
     
     cout << "Tecle <Enter> para Encerrar...";
     cin.ignore();
