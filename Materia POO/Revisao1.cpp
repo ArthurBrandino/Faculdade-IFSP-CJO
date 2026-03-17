@@ -276,13 +276,12 @@ void Ex19(){
         cout << endl;
 }
 
-int Trocador (int &A, int &B)
+void Trocador (int &A, int &B)
 {
     int trocador;
     trocador = A;
     A = B;
     B = trocador;
-    return A, B;
 }
 
 void Ex20(){
@@ -456,9 +455,61 @@ void Ex26(){
     cout << "O Produto mais barato e: "  << Produtos[menor].nome << " R$ " << fixed << setprecision(2) << Produtos[menor].valor << endl; 
 }
 
+void Ex27(){
+    cout << "Programa: Reajuste Salarial" << endl << endl;
+    double salarioAntes, salarioReajuste, reajuste, percentual;
+
+    cout << "Entre com o seu Salario para o calculo de Reajuste: "; cin >> salarioAntes;
+
+    if(salarioAntes <= 2000) percentual = 20;
+    else if (salarioAntes > 2000 && salarioAntes <= 4000) percentual = 15;
+    else if (salarioAntes > 4000 && salarioAntes <= 8000) percentual = 10;
+    else percentual = 5;
+
+    reajuste = salarioAntes * (percentual/100);
+    salarioReajuste = salarioAntes + reajuste;
+
+    cout << "Salario Antes do Reajuste: R$" << fixed << setprecision(2) << salarioAntes << endl;
+    cout << "Percentual de Aumento Aplicado: " << setprecision(0) << percentual << "%" << endl;
+    cout << "Valor do Aumento: R$ " <<  setprecision(2) << reajuste << endl;
+    cout << "Salario com Reajuste: R$ " << salarioReajuste << endl;
+}
+
+void Ex28(){
+    cout << "Programa: Seletor de Dia da Semana" << endl << endl;
+    int opcao;
+    
+    cout << "***************************************************************************************************************" << endl;
+    cout << "1- Domingo | 2- Segunda-feira | 3- Terca-feira | 4- Quarta-feira | 5- Quinta-feira | 6- Sexta-feira | 7- Sabado" << endl;
+    cout << "***************************************************************************************************************" << endl;
+    while (true) {
+        cout << "Entre com o numero correspondente ao dia da semana (1-7): ";
+        if (cin >> opcao) {
+            if (opcao >= 1 && opcao <= 7) {
+                switch (opcao) {
+                    case 1: cout << "Voce Selecionou: Domingo" << endl; break;
+                    case 2: cout << "Voce Selecionou: Segunda-feira" << endl; break;
+                    case 3: cout << "Voce Selecionou: Terca-feira" << endl; break;
+                    case 4: cout << "Voce Selecionou: Quarta-feira" << endl; break;
+                    case 5: cout << "Voce Selecionou: Quinta-feira" << endl; break;
+                    case 6: cout << "Voce Selecionou: Sexta-feira" << endl; break;
+                    case 7: cout << "Voce Selecionou: Sabado" << endl; break;
+                }
+                break; 
+            } else {
+                cout << "Erro: Digite um valor entre 1 e 7!" << endl;
+            }
+        } else {
+            cout << "Erro: Entrada invalida! Digite apenas numeros." << endl;
+            cin.clear();
+            cin.ignore(1000, '\n');
+        }
+    }
+}
+
 int main(){
 
-    Ex26();
+    Ex27();
     
     cout << "Tecle <Enter> para Encerrar...";
     cin.ignore();
