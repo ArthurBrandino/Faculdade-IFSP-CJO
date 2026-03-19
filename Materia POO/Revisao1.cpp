@@ -507,9 +507,168 @@ void Ex28(){
     }
 }
 
+void Ex29(){
+    cout << "Programa: Classificador de Triangulo" << endl << endl;
+    int A, B, C;
+
+    while(true)
+    {
+        cout << "Entre com o Valor do Lado <A> do Triangulo: "; cin >> A;
+        cout << "Entre com o Valor do Lado <B> do Triangulo: "; cin >> B;
+        cout << "Entre com o Valor do Lado <C> do Triangulo: "; cin >> C;
+        
+        if(A + B > C && A + C > B && B + C > A) break;
+
+        cout << "Os Valores Nao Formam um Triangulo!" << endl;
+    }
+  
+    if(A == B && B == C) 
+        cout << "O Triangulo eh Equilatero!";
+    else if(A != B && A != C && B != C)
+        cout << "O Triangulo eh Escaleno!";
+    else
+        cout << "O Triangulo eh Isosceles!";
+
+    cout << endl;
+}
+
+void Ex30(){
+    cout << "Programa: Calculo de Bhaskara" << endl << endl;
+    double A, B, C, delta, result;
+
+    cout << "*  Ax^2 + Bx + C  *" << endl ;
+    cout << "Entre com o Valor de <A>: "; cin >> A;
+    if(A == 0)
+    {
+        cout << "A Equacao nao e do Segundo Grau! \nFinalizando o programa..." << endl;
+        return;
+    }
+
+    cout << "Entre com o Valor de <B>: "; cin >> B;
+    cout << "Entre com o Valor de <C>: "; cin >> C;
+
+    delta = pow(B,2) - 4*A*C;
+    
+    if(delta < 0) cout << "A Equacao Nao Possui Raizes Reais! \nFinalizando o Programa..." << endl;
+    else{
+        if(delta > 0)
+        {
+            result = (-B + pow(delta, 0.5))/( 2* A);
+            double result2 = (-B - pow(delta, 0.5))/( 2* A);
+            cout << "A Equacao Possui 2 Raizes Reais!" << endl;
+            cout << "x1 = " << result << " x2 = " << result2 << endl;
+            cout << "Finalizando o Programa..." << endl;
+        }
+        else{
+            result = -B /(2 * A);
+            cout << "A Equacao Possui 1 Raiz Real!" << endl;
+            cout << "x = " << result << endl;
+            cout << "Finalizando o Programa..." << endl;
+        }
+    }
+}
+
+void Ex31(){
+    cout << "Programa: Verificador de Ano Bissexto" << endl << endl;
+    int ano;
+    cout << "Entre com o Ano Desejado: "; cin >> ano;
+
+    (!(ano % 4) && (ano % 100)) || !(ano % 400 )? cout << "O Ano eh Bissesxto" : cout << "O Ano Nao eh Bissesxto";
+    cout << endl;
+}
+
+void Ex32(){
+    cout << "Programa: Validador de Data Completa" << endl << endl;
+    char barra;
+    int dia, mes, ano;
+
+    cout << "Entre com uma data <dd/mm/aaaa>: "; cin >> dia >> barra >> mes >> barra >> ano;
+   
+    bool dataValida = ((dia > 0 && dia <= 31) &&
+                        (mes > 0 && mes <= 12) &&
+                        ( ano >= 1900 && ano <= 2100));
+
+    dataValida  ?   cout << "A data informada eh Valida!" : 
+                    cout << "A data informada nao eh Valida!";
+
+    cout << endl;
+}
+
+void Ex33(){
+    cout << "Programa: Simulador de Saque de Caixa Eletronico" << endl << endl;
+    int notas[] = {1, 5, 10, 50, 100};
+    int valor, minimo = 10, maximo = 1000;
+
+    cout << "Valor Minimo de Saque R$ " << fixed << setprecision(2) << minimo << endl;
+    cout << "Valor Maximo de Saque R$ " << maximo << endl << endl;
+
+    while(true){
+        cout << "Entre com o Valor a ser Sacado: "; cin >> valor;
+        if(!(valor < minimo || valor > maximo)) break;
+        cout << "Valor Fora do Limite!" << endl;
+    }
+
+    cout << "Valor do Saque: " << valor << endl;
+    cout << "Notas Oferecidas: ";
+
+    for(int i = 4; i >= 0; i--)
+    {
+        int quantidade = valor / notas[i];
+        valor %= notas[i];
+        if(quantidade > 0) cout << quantidade << " nota(s) de R$ " << notas[i] << " - ";
+    }
+    cout << endl;
+}
+
+void Ex34(){
+    cout << "Programa: Identificador de Tipo Numerico" << endl << endl;
+    double n;
+    cout << "Entre com um Numero: "; cin >> n;
+
+    (ceil(n) == n)? cout << "O Numero eh Inteiro" : cout << "O Numero eh Decimal";
+    cout << endl;
+}
+
+void Ex35(){
+    cout << "Programa: Calculadora com Diagnostico de Numero" << endl << endl;
+    double A, B, result;
+    int opcao;
+    bool sair = false;
+    cout << "Entre com o Valor de <A>: "; cin >> A;
+    cout << "Entre com o Valor de <B>: "; cin >> B;
+
+    do{
+        cout << "Escolha Qual Operacao Sera Realizada:" << endl;
+        cout << "(1) Adicao +" << endl;
+        cout << "(2) Subtracao -" << endl;
+        cout << "(3) Mutiplicacao X" << endl;
+        cout << "(4) Divisao /" << endl;
+        cout << "Opcao: "; cin >> opcao;
+
+        switch(opcao){
+            case 1 : result = A + B; sair = true; break;
+            case 2 : result = A - B; sair = true; break;
+            case 3 : result = A * B; sair = true; break;
+            case 4 : if(B != 0){
+                            result = A / B; sair = true; 
+                    } 
+                    else 
+                        cout << "Erro: Divisao por zero nao permitida!" << endl;
+                    break;
+            default : cout << "Opcao Invalida!" << endl;
+        };
+    }while(!sair);
+
+    cout << "O resultado da Opercao eh: " << result << endl;
+    !((int)result % 2)? cout << "a. O numero eh Par!" << endl : cout << "a. O numero eh Impar!" << endl;
+    (result >= 0)? cout << "b. O numero eh Positivo!" << endl : cout << "b. O numero eh Negativo!" << endl;
+    (result == ceil(result))? cout << "c. O numero eh Inteiro!" << endl : cout << "c. O numero eh Decimal!" << endl;
+
+}
+
 int main(){
 
-    Ex27();
+    Ex34();
     
     cout << "Tecle <Enter> para Encerrar...";
     cin.ignore();
