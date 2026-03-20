@@ -666,9 +666,259 @@ void Ex35(){
 
 }
 
+void Ex36(){
+    cout << "Programa: Calculo Desconto Combustivel" << endl << endl;
+    char tipo;
+    double litros, valor;
+
+    cout << "********************" << endl;
+    cout << "<G> Gasolina R$ 5.70" << endl;
+    cout << "<A>   Alcool R$ 3.78" << endl;
+    cout << "********************" << endl;
+
+    while(true){
+        cout << "Entre com o Tipo de Combustivel [G/A]: "; cin >> tipo;
+        tipo = toupper(tipo);
+        if(tipo == 'G' || tipo == 'A') break;
+        cout << "Tipo Invalido!"<< endl;
+    }
+    cout << "Entre com a Quantidade de Litros: "; cin >> litros;
+
+    if(tipo == 'G'){
+        valor = litros * 5.70;
+        (litros <= 20)? valor -= (valor * 0.04) : valor -= (valor * 0.06);
+    }
+    else{
+        valor = litros * 3.78;
+        (litros <= 20)? valor -= (valor *= 0.03) : valor -= (valor * 0.05);
+    }
+    cout << "O Valor a Ser Pago eh R$ " << fixed << setprecision(2) << valor << endl;
+
+}
+
+void Ex37(){
+    cout << "Programa: Calculo Frutaria" << endl << endl;
+    double peso, peso1 = 0, peso2 = 0, entrada, valor = 0;
+    char tipo, resp;
+
+    cout << "*********************************************" << endl;
+    cout << "            Ate 5kg           Acima de 5kg" << endl;
+    cout << "<A> Morango R$ 32,50 por kg | R$ 30,20 por kg" << endl;
+    cout << "<B> Maca    R$ 13,80 por kg | R$ 11,50 por kg" << endl;
+    cout << "*********************************************" << endl;
+
+   while(true){
+     while(true){
+        cout << "Entre com a Fruta Desejada: [A/B]: "; cin >> tipo;
+        tipo = toupper(tipo);
+        if(tipo == 'A' || tipo == 'B') break;
+        cout << "Tipo Invalido!"<< endl;
+        }
+
+    cout << "Entre com a Quantidade de Kg: "; cin >> entrada;
+    (tipo == 'A') ? peso1 += entrada : peso2 += entrada;
+
+    cout << "Deseja Escolher mais Frutas? [S/N]: "; cin >> resp;
+    if(toupper(resp) != 'S') break;
+   }
+    peso = peso1 + peso2;
+    (peso1 <= 5) ? valor += peso1 * 32.50 : valor += peso1 * 30.20;
+    (peso2 <= 5) ? valor += peso2 * 13.80 : valor += peso2 * 11.50;
+    if(peso > 8 || valor > 200) valor -= (valor * 0.1);
+    
+
+    cout << "\nO Valor a Ser Pago eh R$ " << fixed << setprecision(2) << valor << endl;
+}
+
+void Ex38(){
+    cout << "Programa: Calculo Cupom Fiscal" << endl << endl;
+    double peso, desconto = 0, valortotal, valorpagar;
+    char tipo, resp;
+    bool cartaoParaiba = false;
+
+    cout << "************************************************" << endl;
+    cout << "               Ate 5kg           Acima de 5kg" << endl;
+    cout << "<A> Contrafile R$ 40,50 por kg | R$ 35,50 por kg" << endl;
+    cout << "<B> Alcatra    R$ 41,80 por kg | R$ 36,25 por kg" << endl;
+    cout << "<C> Picanha    R$ 39,90 por kg | R$ 35,99 por kg" << endl;
+    cout << "************************************************" << endl;
+
+  
+    while(true){
+        cout << "Entre com a Carne Desejada: [A/B/C]: "; cin >> tipo;
+        tipo = toupper(tipo);
+        if(tipo == 'A' || tipo == 'B' || tipo == 'C') break;
+        cout << "Tipo Invalido!"<< endl;
+    }
+    cout << "Entre com a Quantidade de Kg: "; cin >> peso;
+    
+    if(peso <= 5)
+    {
+        if      (tipo == 'A') valortotal = peso * 40.5;
+        else if (tipo == 'B') valortotal = peso * 41.8;
+        else                  valortotal = peso * 39.9;
+    }
+    else{
+        if      (tipo == 'A') valortotal = peso * 35.5;
+        else if (tipo == 'B') valortotal = peso * 36.25;
+        else                  valortotal = peso * 35.99;
+    }
+
+    cout << endl;
+    if      (tipo == 'A') cout << "Tipo <A>: Contrafile" << endl;
+    else if (tipo == 'B') cout << "Tipo <B>: Alcatra" << endl;
+    else                  cout << "Tipo <C>: Picanha" << endl;
+
+    cout << "Quantidade em Kg " << fixed << setprecision(2) << peso << endl;
+    cout << "O Valor Total R$ " << valortotal << endl;
+    
+    cout << "\nUtilizara o Cartao Paraiba?  5 % de Desconto no Valor da Compra [S/N] "; cin >> resp;
+    if(toupper(resp) == 'S') cartaoParaiba = true;
+    
+    cout << "\nForma de Pagamento: ";
+    if(cartaoParaiba)
+    {
+         cout << "Cartao Paraiba" << endl;
+        desconto = valortotal * 0.05;
+        valorpagar = valortotal  - desconto;
+    }
+    else{
+        cout << "Outra Forma " << endl;
+        valorpagar = valortotal;
+    }
+    cout << "O Valor do Desconto R$ -" << desconto << endl;
+    cout << "O Valor a Pagar R$ " << valorpagar << endl;
+}
+
+void Ex39(){
+    cout << "Programa: Classificador de Triangulo" << endl << endl;
+    double A, B, C;
+    cout << "Entre com o Valor do Angulo <A>: "; cin >> A;
+    cout << "Entre com o Valor do Angulo <B> "; cin >> B;
+    cout << "Entre com o Valor do Angulo <C> "; cin >> C;
+
+    if((A + B + C == 180) && A > 0 && B > 0 && C > 0)
+    {
+        if(A == 90 || B == 90 || C == 90) cout << "Triangulo Retangulo";
+        else if(A > 90 || B > 90 || C > 90) cout << "Triangulo Obtusangulo";
+        else cout << "Triangulo Acutangulo";
+    }
+    else cout << "Triangulo Invalido!";
+
+    cout << endl;
+}
+
+void Ex40(){
+    cout << "Programa: Calculo IMC" << endl << endl;
+    double IMC, peso, altura;
+
+    cout << "Entre com o Seu Peso em Kg: "; cin >> peso;
+    cout << "Entre com a sua Altura em Metros: "; cin >> altura;
+
+    IMC = peso / pow(altura, 2);
+
+    if(IMC < 20) cout << "Avaliacao: Abaixo do Normal";
+    else if(IMC < 25) cout << "Avaliacao: Normal";
+    else if(IMC < 30) cout << "Avaliacao: Sobrepeso";
+    else if(IMC < 35) cout << "Avaliacao: Obesidade Leve";
+    else if(IMC < 40) cout << "Avaliacao: Obesidade Moderada";
+    else cout << "Avaliacao: Obesidade Morbida";
+    cout << endl;
+}
+
+void Ex41(){
+    cout << "Programa: Crescimento Populacional" << endl << endl;
+
+    struct populacao{
+        char nome;
+        int habitantes;
+        double crescimento;
+    };
+
+    int anos = 0;
+
+    populacao paises[2];
+    paises[0].nome = 'A';
+    paises[0].habitantes = 80000;
+    paises[0]. crescimento = 0.03;
+
+    paises[1].nome = 'B';
+    paises[1].habitantes = 200000;
+    paises[1]. crescimento = 0.015;
+
+    do{
+        paises[0].habitantes += paises[0].habitantes * paises[0]. crescimento;
+        paises[1].habitantes += paises[1].habitantes * paises[1]. crescimento;
+        anos++;
+    }while(paises[0].habitantes < paises[1].habitantes);
+
+    cout << "Foram Necessarios " << anos << " anos para o " << paises[0].nome << " Ultrapassar/Igualar o numero de habitantes do " << paises[1].nome << endl;
+    cout << "Total de Habitantes do " << paises[0].nome << " = " <<paises[0].habitantes << endl;
+    cout << "Total de Habitantes do " << paises[1].nome << " = " <<paises[1].habitantes << endl;
+}   
+
+void Ex42(){
+    cout << "Programa: Sequencia Numerica" << endl << endl;
+    
+    cout << "Um abaixo do Outro:" << endl;
+    for(int i = 1; i <=20; i++)     cout << i << endl;
+
+    cout << "Um do Lado do Outro: ";
+    for(int i = 1; i <=20; i++)
+    {
+        cout << i;
+        (i != 20)? cout << ", " : cout << ".";
+    }
+    cout << endl;
+}
+
+void Ex43(){
+    cout << "Programa: Soma e Media" << endl << endl;
+    
+    double total = 0;
+    int N, quantidade = 5;
+    
+    for(int i = 0; i < quantidade; i++)
+    {
+        cout << "Entre com o " << i+1 << ".o Valor: "; cin >> N;
+        total += N;
+    }
+
+    cout << "Soma = " << total << endl;
+    cout << "Media = " << fixed << setprecision(2) << total / quantidade << endl;
+
+}
+
+void Ex44(){
+    cout << "Programa: Expoente sem <cmath>" << endl << endl;
+    
+    int N, E;
+    long long result = 1;
+
+    cout << "Entre com a Base: "; cin >> N;
+    cout << "Entre com o Expoente: "; cin >> E;
+    if(E > 0)   for(int i = 0; i < E; i++) result *= N;
+    else        result = 1;
+
+    cout << N << "^" << E << " = " << result << endl;
+}
+
+void Ex45(){
+    cout << "Programa: Contador de Pares e Impares" << endl << endl;
+    
+    int N, pares = 0, impares = 0;
+    for(int i = 0; i < 10; i++) 
+    {
+        cout << "Entre com o " << i+1 << ".o Valor: "; cin >> N;
+        (0 == N % 2) ? pares++ : impares++;
+    }
+
+    cout << pares << " Pares e " << impares << " Impares" << endl;
+}
+
 int main(){
 
-    Ex34();
+    Ex45();
     
     cout << "Tecle <Enter> para Encerrar...";
     cin.ignore();
