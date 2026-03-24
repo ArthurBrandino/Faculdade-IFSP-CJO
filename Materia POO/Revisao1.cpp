@@ -1,6 +1,9 @@
 #include <iostream>
 #include <iomanip>
 #include <cmath>
+#include <vector>
+#include <algorithm>
+#include <numeric>
 
 using namespace std;
 
@@ -929,37 +932,92 @@ void Ex46(){
     cout  << "o farotial eh: " << fatorial << endl;
 }
 
-void Ex46(){
-    cout << "Programa: Calculo Fatorial" << endl << endl;
-    int N, fatorial = 1;
-    cout << "Entre com o Numero desejado: "; cin >> N;
-
-    for(int i = N; i > 1; i--) 
-    {
-        fatorial *= i;
-    }
-
-    cout  << "o farotial eh: " << fatorial << endl;
-}
-
 void Ex47(){
     cout << "Programa: Identificador de Numero Primo" << endl << endl;
     int N;
+    bool primo = true;
     cout << "Entre com o Numero desejado: "; cin >> N;
-
-    for (int i = 1; i <= N; i++)
+    
+    if(N <= 1) primo = false;
+    for (int i = 2; i < N; i++)
     {
-        
+        if(0 == N % i)
+        {
+            primo = false;
+            break;
+        }
     }
     
-    
-    cout  << "o farotial eh: " << fatorial << endl;
+    (primo) ? cout << "O numero e primo!" :  cout << "O numero nao eh primo";
+    cout << endl;
 }
 
+void Ex48(){
+    cout << "Programa: Academia" << endl << endl;
+
+    struct dados{
+        int codigo;
+        float altura;
+        float peso;
+    };
+
+    dados entrada;
+    vector<dados> pessoas;
+
+    cout  << "Entre com os Dados Solicitados " << endl;
+    while (true){
+        cout << "Informe Seu Codigo: "; cin >> entrada.codigo;
+        if (entrada.codigo == 0)  break; 
+        cout << "Informe Sua Altura: "; cin >> entrada.altura;
+        cout << "Informe Seu Peso: "; cin >> entrada.peso;
+        pessoas.push_back(entrada);
+    }
+    if (pessoas.empty()) {
+        cout << "Nenhum dado inserido." << endl;
+        return;
+    }
+
+    auto maisAlto = max_element(pessoas.begin(), pessoas.end(),
+    [](const dados& a, const dados&b){
+        return a.altura < b.altura;
+    });
+
+    auto maisBaixo = max_element(pessoas.begin(), pessoas.end(),
+    [](const dados& a, const dados&b){
+        return a.altura > b.altura;
+    });
+
+    auto maisMagro = max_element(pessoas.begin(), pessoas.end(),
+    [](const dados& a, const dados&b){
+        return a.peso < b.peso;
+    });
+
+    auto maisGordo = max_element(pessoas.begin(), pessoas.end(),
+    [](const dados& a, const dados&b){
+        return a.peso > b.peso;
+    });
+
+    auto somaPeso = accumulate(pessoas.begin(), pessoas.end(), 0.0,
+    [](double total, const dados& p) {
+        return total + p.peso;
+    });
+
+    auto somaAltura = accumulate(pessoas.begin(), pessoas.end(), 0.0,
+    [](double total, const dados& p) {
+        return total + p.altura
+    });
+    
+    cout << "Mais Alto | Codigo: " << maisAlto->codigo << " Peso: " << maisAlto->codigo << " kg - Altura: " << maisAlto->altura << endl;
+    cout << "Mais Baixo | Codigo: " << maisBaixo->codigo << " Peso: " << maisBaixo->codigo << " kg - Altura: " << maisBaixo->altura << endl;
+    cout << "Mais Magro | Codigo: " << maisMagro->codigo << " Peso: " << maisMagro->codigo << " kg - Altura: " << maisMagro->altura << endl;
+    cout << "Mais Gordo | Codigo: " << maisGordo->codigo << " Peso: " << maisGordo->codigo << " kg - Altura: " << maisGordo->altura << endl;
+    cout << "Media de Peso da Academia: " << somaPeso/pessoas.size() << " kg" << endl;
+    cout << "Media de Altura da Academia: " << somaAltura/pessoas.size() << " metros" << endl;
+}
 
 int main(){
 
-    Ex46();
+    Ex47();
     
     cout << "Tecle <Enter> para Encerrar...";
     cin.ignore();
