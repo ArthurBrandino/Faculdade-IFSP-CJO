@@ -916,9 +916,50 @@ void Ex45(){
     cout << pares << " Pares e " << impares << " Impares" << endl;
 }
 
+void Ex46(){
+    cout << "Programa: Calculo Fatorial" << endl << endl;
+    int N, fatorial = 1;
+    cout << "Entre com o Numero desejado: "; cin >> N;
+
+    for(int i = N; i > 1; i--) 
+    {
+        fatorial *= i;
+    }
+
+    cout  << "o farotial eh: " << fatorial << endl;
+}
+
+void Ex46(){
+    cout << "Programa: Calculo Fatorial" << endl << endl;
+    int N, fatorial = 1;
+    cout << "Entre com o Numero desejado: "; cin >> N;
+
+    for(int i = N; i > 1; i--) 
+    {
+        fatorial *= i;
+    }
+
+    cout  << "o farotial eh: " << fatorial << endl;
+}
+
+void Ex47(){
+    cout << "Programa: Identificador de Numero Primo" << endl << endl;
+    int N;
+    cout << "Entre com o Numero desejado: "; cin >> N;
+
+    for (int i = 1; i <= N; i++)
+    {
+        
+    }
+    
+    
+    cout  << "o farotial eh: " << fatorial << endl;
+}
+
+
 int main(){
 
-    Ex45();
+    Ex46();
     
     cout << "Tecle <Enter> para Encerrar...";
     cin.ignore();
