@@ -4,6 +4,7 @@
 #include <vector>
 #include <algorithm>
 #include <numeric>
+#include <string>
 
 using namespace std;
 
@@ -1004,7 +1005,7 @@ void Ex48(){
 
     auto somaAltura = accumulate(pessoas.begin(), pessoas.end(), 0.0,
     [](double total, const dados& p) {
-        return total + p.altura
+        return total + p.altura;
     });
     
     cout << "Mais Alto | Codigo: " << maisAlto->codigo << " Peso: " << maisAlto->codigo << " kg - Altura: " << maisAlto->altura << endl;
@@ -1015,9 +1016,47 @@ void Ex48(){
     cout << "Media de Altura da Academia: " << somaAltura/pessoas.size() << " metros" << endl;
 }
 
+void Ex49(){
+    cout << "Programa: Identificador de Aluno mais Alto e mais Baixo" << endl << endl;
+
+    struct dados{
+        string nome;
+        float altura;
+    };
+
+    vector<dados> alunos;
+    dados entrada;
+
+   for (int i = 0; i < 10; i++)
+   {
+        cout << "Entre com o " << i+1 << "o. Nome: ";
+        getline(cin >> ws, entrada.nome);
+
+        cout << "Entre com a " << i+1 << ".o Altura: "; cin >> entrada.altura;
+
+        cin.ignore(1000, '\n');
+        alunos.push_back(entrada);
+   }
+   
+    auto maisAlto = max_element(alunos.begin(), alunos.end(),
+    [](const dados& a, const dados& b){
+        return a.altura < b.altura;
+    });
+    
+    auto maisBaixo = min_element(alunos.begin(), alunos.end(),
+    [](const dados& a, const dados& b){
+        return a.altura > b.altura;
+    });
+    
+    
+    cout << "O Aluno mais alto eh: " << maisAlto->nome << " com " << fixed << setprecision(2) << maisAlto->altura << " metros" << endl;
+    cout << "O Aluno mais baixo eh: " << maisBaixo->nome << " com " << maisBaixo->altura << " metros" << endl;
+
+}
+
 int main(){
 
-    Ex47();
+    Ex49();
     
     cout << "Tecle <Enter> para Encerrar...";
     cin.ignore();
