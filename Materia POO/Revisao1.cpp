@@ -1054,6 +1054,69 @@ void Ex49(){
 
 }
 
+void Ex50(){
+    cout << "Programa: Corretor de Provas" << endl << endl;
+
+    const char gabarito[] = {'A', 'B', 'C', 'D', 'E', 'E', 'D', 'C', 'B', 'A'};
+
+    struct dados{
+        string nome;
+        vector<char> resposta;
+        int nota = 0;
+    };
+
+    vector<dados> alunos;
+    dados entrada;
+    char respTemp;
+    float somaNotas = 0;
+    float mediaTurma = 0;
+
+    while(true){
+        cout << "Respostas Possiveis: < A | B | C | D | E >" << endl << endl;
+        cout << "Entre com Seu Nome: ";
+        getline(cin >> ws, entrada.nome);
+
+        for(int i = 0; i < 10; i++)
+        {
+            cout << "Entre com a Respotas da Questão " << i+1 <<  ": ";
+            cin >> respTemp;
+            entrada.resposta.push_back(toupper(respTemp));
+        }
+        alunos.push_back(entrada);
+        cout << "Resposta Salva Com Sucesso!" << endl;
+
+        entrada.resposta.clear();
+        cout << "Deseja Adicionar Mais Um Aluno? [S/N]: "; cin >> respTemp;
+        if(toupper(respTemp) == 'N') break;
+    }
+   
+    for(auto& aluno : alunos){
+        int acertos = 0; 
+        for (int i = 0; i < 10; i++)    if(aluno.resposta[i] == gabarito[i]) acertos++;
+        aluno.nota = acertos;
+        somaNotas += aluno.nota;
+    }
+
+    auto maiorNota = max_element(alunos.begin(), alunos.end(),
+    [](const dados& a, const dados& b){
+        return a.nota < b.nota;
+    });
+    
+    auto menorNota = min_element(alunos.begin(), alunos.end(),
+    [](const dados& a, const dados& b){
+        return a.nota < b.nota;
+    });
+    
+    mediaTurma = somaNotas / alunos.size();
+
+    cout << "Quantidade de Respostas Registradas: " << alunos.size() << endl;
+    cout << "A Media de Nota da Turma Foi: " << mediaTurma << endl;
+    cout << "O Aluno com a Maior Nota eh: " << maiorNota->nome << " com " << fixed << setprecision(2) << maiorNota->nota << " pontos" << endl;
+    cout << "O Aluno com a Menor Nota eh: " << menorNota->nome << " com " << menorNota->nota << " pontos" << endl;
+
+}
+
+
 int main(){
 
     Ex49();
