@@ -188,11 +188,10 @@ namespace Revisao2 {
     }
 
     void Ex52(){
-        cout << "Programa: Verificador de Ordenacao Crescente" << endl;
+        cout << "Programa: Ordenacao Crescente" << endl;
 
         vector<int> vetor;
         int entrada;
-        bool ordenado = true;
 
         for (int i = 0; i < 20; i++)
         {
@@ -215,6 +214,119 @@ namespace Revisao2 {
             cout << vetor[i];
             (i == vetor.size()-1)? cout << "." << endl : cout << ", ";
         }
+    }
+
+    void Ex53(){
+        cout << "Programa: Ordenacao Decrescente" << endl;
+
+        vector<int> vetor;
+        int entrada;
+
+        for (int i = 0; i < 20; i++)
+        {
+            cout << "Entre com o " << i+1 << ".o Valor: "; cin >> entrada; 
+            vetor.push_back(entrada); 
+        }
+        
+        cout << "Vetor Antes da Ordenacao: ";
+        for(int i = 0; i < vetor.size(); i++)
+        {
+            cout << vetor[i];
+            (i == vetor.size()-1)? cout << "." << endl : cout << ", ";
+        }
+
+        sort(vetor.rbegin(), vetor.rend());
+
+        cout << "Vetor Apos a Ordenacao: ";
+        for(int i = 0; i < vetor.size(); i++)
+        {
+            cout << vetor[i];
+            (i == vetor.size()-1)? cout << "." << endl : cout << ", ";
+        }
+    }
+
+    void Ex54(){
+        cout << "Programa: Ordenacao Crescente e Decrescente" << endl;
+
+        vector<int> vetor;
+        int entrada;
+        char tipo;
+
+        for (int i = 0; i < 20; i++)
+        {
+            cout << "Entre com o " << i+1 << ".o Valor: "; cin >> entrada; 
+            vetor.push_back(entrada); 
+        }
+        
+        while(true)
+        {
+            cout << "A Ordenacao Deve ser Crescente ou Decrescente? <C> Crescente / <D> Decrescente: ";
+            cin >> tipo; 
+            tipo = toupper(tipo);
+            if(tipo == 'C' || tipo == 'D') break;
+            cout << "Tipo Invalido!" << endl;
+        }
+
+        cout << "Vetor Antes da Ordenacao: ";
+        for(int i = 0; i < vetor.size(); i++)
+        {
+            cout << vetor[i];
+            (i == vetor.size()-1)? cout << "." << endl : cout << ", ";
+        }
+
+        (tipo == 'C')? sort(vetor.begin(), vetor.end()) : sort(vetor.rbegin(), vetor.rend()); 
+
+        cout << "Vetor Apos a Ordenacao ";
+        (tipo =='C')? cout << "Crecente: " << endl : cout << "Decrescente: " << endl;
+
+        for(int i = 0; i < vetor.size(); i++)
+        {
+            cout << vetor[i];
+            (i == vetor.size()-1)? cout << "." << endl : cout << ", ";
+        }
+
+        cout << "Entre com um Numero Inteiro: "; cin >> entrada;
+        vetor.push_back(entrada);
+
+        (tipo == 'C')? sort(vetor.begin(), vetor.end()) : sort(vetor.rbegin(), vetor.rend());
+
+        cout << "Vetor Apos a Reordenacao: ";
+        for(int i = 0; i < vetor.size(); i++)
+        {
+            cout << vetor[i];
+            (i == vetor.size()-1)? cout << "." << endl : cout << ", ";
+        }
+    }
+
+    void Ex55(){
+        cout << "Programa: Pesquisa de Valor" << endl;
+
+        vector<int> vetor;
+        int entrada, alvo, posicao = 0;
+        bool achou = false;
+
+        for (int i = 0; i < 20; i++)
+        {
+            cout << "Entre com o " << i+1 << ".o Valor: "; cin >> entrada; 
+            vetor.push_back(entrada); 
+        }
+
+        sort(vetor.begin(), vetor.end());
+        
+        cout << "Entre com um Numero a Ser Pesquisado: "; cin >> alvo;
+
+        for(int i = 0; i < vetor.size(); i++)
+        {
+            if(vetor[i] == alvo)
+            {
+                posicao = i + 1;
+                achou = true;
+                break;
+            }
+        }
+
+        if(achou) cout << "O numero foi encontrado na posicao: " << posicao << endl;
+        else cout << "O numero nao foi encontrado!" << endl;
     }
 >>>>>>> 9d75bd0 (update: atualizando matérias)
 }
