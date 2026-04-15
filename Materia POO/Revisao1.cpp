@@ -1116,4 +1116,44 @@ namespace Revisao1{
         cout << "O Aluno com a Menor Nota eh: " << menorNota->nome << " com " << menorNota->nota << " pontos" << endl;
 
     }
+
+    void Ex51(){
+        cout << "Programa: Prova de Saltos" << endl << endl;
+
+        vector<float> saltos;
+        float entrada, melhor = 0, pior = 0, media = 0;
+        string nome;
+
+        cout << "Entre com Seu Nome: "; 
+        getline(cin, nome);
+
+        for(int i = 0; i < 5; i++)
+        {
+            cout << "Entre com " << i+1 <<  " salto: ";
+            cin >> entrada;
+            saltos.push_back(entrada);
+            if(entrada > saltos[melhor]) melhor = i;
+            if(entrada < saltos[pior]) pior = i;
+        }
+
+        for(int i = 0; i < 5; i++)
+        {
+            if(i != melhor && i != pior)
+                media += saltos[i];
+        }
+        
+        media /= 3;
+        
+
+        cout << "Atleta: " << nome << endl;
+        for(int i = 0; i < 5; i++)
+        {
+            cout << i+1 << ".o Salto: " << fixed << setprecision(1) << saltos[i] << " m" << endl;
+        }
+        cout << "Melhor Salto: " <<  saltos[melhor]  << " m " << endl;
+        cout << "Pior Salto: " <<  saltos[pior]  << " m " << endl;
+        cout << "Media dos Demais: " <<  media  << " m " << endl;
+        cout << "Resultado Final: " << endl;
+        cout << nome << ": " << media << " m" << endl;
+    }
 }
