@@ -1,7 +1,9 @@
 import Phaser from 'phaser';
 
 export class Defesa extends Phaser.GameObjects.Rectangle {
-    constructor(scene, x, y, largura, altura, hp, speed, dano, range, custo) {
+    constructor(scene, x, y, hp, speed, dano, range, custo) {
+        const largura = 100;
+        const altura = 100;
         super(scene, x, y, largura, altura);
         
         scene.add.existing(this);

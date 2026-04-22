@@ -36,11 +36,14 @@ export class Pastas extends Phaser.GameObjects.Rectangle {
 
     static gerarGrupo(scene, quantidade) {
         for (let i = 0; i < quantidade; i++) {
-            const x = Phaser.Math.Between(100, 1900);   // area X que Pode Ser spawnadas
-            const y = Phaser.Math.Between(100, 1900);   // area Y que Pode Ser spawnadas
+            let xRaw = Phaser.Math.Between(100, 1900);
+            let yRaw = Phaser.Math.Between(100, 1900);
             
-            // Aqui a classe cria instâncias de si mesma
-            new Pastas(scene, x, y);
+            //Grid 50X50
+            const xFinal = Math.floor(xRaw / 50) * 50 + 25;
+            const yFinal = Math.floor(yRaw / 50) * 50 + 25;
+
+            new Pastas(scene, xFinal, yFinal);
         }
     }
 }

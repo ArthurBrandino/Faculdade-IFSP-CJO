@@ -4,15 +4,13 @@ const COR_CLICKER = 0xeeeeee;
 
 export class Clicker extends Defesa {
     constructor(scene, x, y) {
-        const largura = 25; 
-        const altura = 25;
         const vida = 100;     // HP
         const taxaTiro = 200; // SPEED (intervalo entre tiros)
         const dano = 1;       // DANO
         const alcance = 300;  // RANGE
         const custo = 50;     // CUSTO
 
-        super(scene, x, y, largura, altura, vida, taxaTiro, dano, alcance, custo);
+        super(scene, x, y, vida, taxaTiro, dano, alcance, custo);
         this.setFillStyle(COR_CLICKER);
         this.proximoTiro = 0;
     }

@@ -56,44 +56,51 @@ export class Game extends Scene {
             this.tentarConstruir(worldPoint.x, worldPoint.y);
         });
 
-        this.physics.add.overlap(this.inimigos, this.processador, (proc, inimigo) => {
-                if (inimigo instanceof Worm) {
-                    inimigo.aoColidir(proc);
-                } else {
-                    proc.receberDano(inimigo.dano);
-                    inimigo.morrer();
-                }
-            }, null, this);
+        const tratarColisao = (alvo, inimigo) => {
+            if (!inimigo.active) return;
 
-            // Colisão com as Defesas
-            this.physics.add.collider(this.inimigos, this.defesas, (inimigo, defesa) => {
-                if (inimigo instanceof Worm) {
-                    inimigo.aoColidir(defesa);
-                } else {
-                    defesa.receberDano(inimigo.dano);
-                    inimigo.morrer();
+            if (inimigo instanceof Worm) {
+                if (!inimigo.ehSegmento) {
+                    inimigo.aoColidir(alvo);
                 }
-        }, null, this);
+            } else {
+                if (alvo.receberDano) alvo.receberDano(inimigo.dano);
+                if (inimigo.morrer) inimigo.morrer();
+            }
+        };
+
+        this.physics.add.overlap(this.inimigos, this.processador, (proc, inimigo) => tratarColisao(proc, inimigo));
+        this.physics.add.collider(this.inimigos, this.defesas, (inimigo, defesa) => tratarColisao(defesa, inimigo));
     }
 
     tentarConstruir(x, y) {
+        //Grid 50x50
+        const snapX = Math.floor(x / 50) * 50 + 25;
+        const snapY = Math.floor(y / 50) * 50 + 25;
+
+        const jaOcupado = this.defesas.getChildren().some(d => d.x === snapX && d.y === snapY);
+        if (jaOcupado) {
+            console.log("Slot ocupado!");
+            return; 
+        }
+
         let novaDefesa;
         let custo = 0;
 
         if (this.selecionada === 1) {
             custo = 50;
             if (this.bits >= custo) {
-                novaDefesa = new Clicker(this, x, y);
+                novaDefesa = new Clicker(this, snapX, snapY);
             }
         } else if (this.selecionada === 2) {
             custo = 150;
             if (this.bits >= custo) {
-                novaDefesa = new Lixeira(this, x, y);
+                novaDefesa = new Lixeira(this, snapX, snapY);
             }
         } else if (this.selecionada === 3) {
             custo = 20;
             if (this.bits >= custo) {
-                novaDefesa = new Firewall(this, x, y);
+                novaDefesa = new Firewall(this, snapX, snapY);
             }
         }
 
