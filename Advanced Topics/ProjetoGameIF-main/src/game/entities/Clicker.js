@@ -1,16 +1,19 @@
 import { Defesa } from './Defesa.js';
+import { Worm } from "../entities/Worm.js";
 
 const COR_CLICKER = 0xeeeeee;
 
 export class Clicker extends Defesa {
     constructor(scene, x, y) {
+        const largura = 100;
+        const altura = 100;
         const vida = 100;     // HP
-        const taxaTiro = 200; // SPEED (intervalo entre tiros)
+        const taxaTiro = 20000; // SPEED (intervalo entre tiros)
         const dano = 1;       // DANO
         const alcance = 300;  // RANGE
         const custo = 50;     // CUSTO
 
-        super(scene, x, y, vida, taxaTiro, dano, alcance, custo);
+        super(scene, x, y, largura, altura, vida, taxaTiro, dano, alcance, custo);
         this.setFillStyle(COR_CLICKER);
         this.proximoTiro = 0;
     }
@@ -22,19 +25,31 @@ export class Clicker extends Defesa {
     }
 
     atirarNoMaisProximo(time) {
-        // Usamos this.range que já foi definido no super da Defesa.js
-        const inimigo = this.scene.inimigos.getChildren().find(i => 
-            i.active && Phaser.Math.Distance.Between(this.x, this.y, i.x, i.y) <= this.range
-        );
+        // Filtramos os inimigos no alcance
+        const alvo = this.scene.inimigos.getChildren().find(inimigo => {
+            // 1. Deve estar ativo
+            if (!inimigo.active) return false;
 
-        if (inimigo) {
-            inimigo.receberDano(this.dano); 
-            this.proximoTiro = time + this.speed; // Usamos this.speed definido no super
+            // 2. Deve estar no alcance (range)
+            const distancia = Phaser.Math.Distance.Between(this.x, this.y, inimigo.x, inimigo.y);
+            if (distancia > this.range) return false;
+
+            // 3. REGRA DO WORM: Se for Worm, só foca se NÃO for segmento (ou seja, se for a cabeça)
+            if (inimigo instanceof Worm && inimigo.ehSegmento) {
+                return false;
+            }
+
+            return true; // Se passou por tudo, é um alvo válido (ILY, Trojan ou Cabeça de Worm)
+        });
+
+        if (alvo) {
+            alvo.receberDano(this.dano); 
+            this.proximoTiro = time + this.speed;
             
-            // Feedback visual de clique
+            // Feedback visual
             this.scene.tweens.add({
                 targets: this,
-                scale: 0.7,
+                scale: 0.8,
                 duration: 50,
                 yoyo: true
             });
