@@ -29,8 +29,11 @@ export class Defesa extends Phaser.GameObjects.Rectangle {
         this.scene.tweens.add({
             targets: this,
             fillAlpha: 0.5,
-            duration: 100,
-            yoyo: true
+            duration: 30,
+            yoyo: true,
+            onComplete: () => {
+                this.fillAlpha = 1; // Garantia extra de que voltará ao normal
+            }
         });
 
         if (this.hp <= 0) {
@@ -40,8 +43,8 @@ export class Defesa extends Phaser.GameObjects.Rectangle {
 
     atualizarBarraVida() {
         this.barraVida.clear();
-        
-        // Só desenha a barra se a defesa estiver danificada (opcional)
+        this.barraVida.setDepth(101);
+        // Só desenha a barra se a defesa estiver danificada
         if (this.hp < this.maxHp && this.hp > 0) {
             const larguraTotal = this.width * 0.8;
             const alturaBarra = 6;

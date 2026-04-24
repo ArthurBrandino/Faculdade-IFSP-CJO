@@ -70,28 +70,53 @@ export class Game extends Scene {
             this.tentarConstruir(worldPoint.x, worldPoint.y);
         });
 
-        const tratarColisao = (alvo, inimigo) => {
+        const tratarColisao = (objetoInimigo, objetoDefesa) => {
+            // Agora o código sabe quem é quem
+            const inimigo = objetoInimigo;
+            const alvo = objetoDefesa;
+
             if (!inimigo.active || !alvo.active) return;
 
+            console.log("Colisão com:", alvo.constructor.name); // Veja se aparece "Clicker" ou "Defesa"
+
             if (inimigo instanceof Worm) {
-                if (!inimigo.ehSegmento) {
-                    // O Worm dá o dano dele e morre (muda de cabeça)
-                    inimigo.aoColidir(alvo); 
-                }
+                if (!inimigo.ehSegmento) inimigo.aoColidir(alvo);
             } else {
-                // Inimigos normais (Trojan, ILY) causam dano e morrem ao tocar a defesa
                 if (alvo.receberDano) {
-                    alvo.receberDano(inimigo.dano);
+                    alvo.receberDano(inimigo.dano || 10);
                 }
-                if (inimigo.morrer) {
-                    inimigo.morrer();
-                }
+                if (inimigo.morrer) inimigo.morrer();
             }
         };
 
-        this.physics.add.overlap(this.inimigos, this.processador, (proc, inimigo) => tratarColisao(proc, inimigo));
-        this.physics.add.collider(this.inimigos, this.defesas, (inimigo, defesa) => tratarColisao(defesa, inimigo));
-    }
+        this.physics.add.overlap(this.inimigos, this.processador, (proc, inimigo) => {
+            // 1. O Processador leva dano (se você quiser)
+            if (proc.receberDano) proc.receberDano(inimigo.dano);
+
+            // 2. O Inimigo MORRE ao tocar o Processador
+            if (inimigo.morrer) {
+                inimigo.morrer();
+            } else if (inimigo instanceof Worm) {
+                inimigo.aoColidir(proc); // Worm tem lógica própria de morte
+            }
+        }, null, this);
+        this.physics.add.overlap(this.inimigos, this.defesas, (inimigo, defesa) => {
+            tratarColisao(defesa, inimigo);
+        }, null, this);
+
+
+        //testes
+        
+        const debugSpawn = (classeInimigo) => {
+        const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
+        const inimigo = new classeInimigo(this, worldPoint.x, worldPoint.y);
+            this.inimigos.add(inimigo);
+        };
+
+        this.input.keyboard.on('keydown-Q', () => debugSpawn(Worm));
+        this.input.keyboard.on('keydown-E', () => debugSpawn(Trojan));
+        this.input.keyboard.on('keydown-R', () => debugSpawn(ILY));
+        }
 
     tentarConstruir(x, y) {
         if (!this.dadosDefesas || !this.dadosDefesas[this.selecionada]) return;
