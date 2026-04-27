@@ -27,4 +27,8 @@ export class Player extends Phaser.GameObjects.Rectangle {
         if (this.cursors.up.isDown || this.teclasWASD.up.isDown)            this.body.setVelocityY(-this.speed);
         else if (this.cursors.down.isDown || this.teclasWASD.down.isDown)   this.body.setVelocityY(this.speed);
     }
+
+    atacar(worldPoint, listaInimigos, listaPastas) {
+        this.play('animacao-ataque');
+    }
 }

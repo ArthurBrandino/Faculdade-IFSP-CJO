@@ -20,68 +20,123 @@ export class Game extends Scene {
         //Player
         this.enzinho = new Player(this, 1100, 1100);
 
-        //Gerar as Pastas do pastas.js
-        //Pastas.gerarGrupo(this, 15);
-
         //Processador
         this.processador = new Processador(this, 1000, 1000);
-
         this.physics.add.collider(this.enzinho, this.processador);
 
+        //Camera
         this.cameras.main.startFollow(this.enzinho, true); // O 'true' ativa o arredondamento de pixels
         this.cameras.main.centerOn(1000, 1000); // Força a câmera a olhar para o centro no início
 
+        //Moeda do Jogo
         this.bits = 0;
         this.textoBits = this.add.text(850, 16, 'Bits: 0', { fontSize: '32px', fill: '#fff' });
-        
         this.textoBits.setScrollFactor(0);
 
         this.inimigos = this.physics.add.group({runChildUpdate: true });
 
+        //Gerenciamento de Ondas
         this.gerenciadorOndas = new WaveManager(this, WAVES);
         this.gerenciadorOndas.iniciarSistema();
 
         this.defesas = this.add.group({ runChildUpdate: true });
 
-        // Preview de construção
         this.dadosDefesas = {
-            1: { nome: 'Clicker', largura: 100, altura: 100, cor: 0xeeeeee, custo: 50 },
-            2: { nome: 'Lixeira', largura: 30, altura: 40, cor: 0x0055ff, custo: 150 },
-            3: { nome: 'Firewall', largura: 60, altura: 20, cor: 0xff4400, custo: 20 }
+            1: { nome: 'Combate', modo: 'acao' },
+            2: { 
+                nome: 'Clicker', 
+                largura: Clicker.LARGURA, 
+                altura: Clicker.ALTURA, 
+                cor: Clicker.COR, 
+                custo: Clicker.CUSTO, 
+                range: Clicker.RANGE, 
+                modo: 'construcao',
+                classe: Clicker 
+            },
+            /*3: { 
+                nome: 'Lixeira', 
+                largura: Lixeira.LARGURA, 
+                altura: Lixeira.ALTURA, 
+                cor: Lixeira.COR, 
+                custo: Lixeira.CUSTO, 
+                range: Lixeira.RANGE, 
+                modo: 'construcao',
+                classe: Lixeira 
+            },
+            4: { 
+                nome: 'Firewall', 
+                largura: Firewall.LARGURA, 
+                altura: Firewall.ALTURA, 
+                cor: Firewall.COR, 
+                custo: Firewall.CUSTO, 
+                range: Firewall.RANGE, 
+                modo: 'construcao',
+                classe: Firewall 
+            }*/
         };
 
         this.selecionada = 1;
 
-        // 2. Criar o Fantasma (Preview)
-        this.previewConstrucao = this.add.rectangle(0, 0, 25, 25, 0xffffff, 0.5);
-        this.previewConstrucao.setOrigin(0.5);
-        this.previewConstrucao.setDepth(100);
-        this.previewConstrucao.setVisible(false);
+        //Preview
+        this.previewConstrucao = this.add.rectangle(0, 0, 100, 100, 0xffffff, 0.5);
+        this.previewConstrucao.setOrigin(0.5).setDepth(100).setVisible(false);
+        this.previewRange = this.add.graphics();
+        this.previewRange.setDepth(99).setVisible(false);
+        this.previewPreco = this.add.text(0, 0, '', {
+            fontSize: '16px',
+            fill: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 3,
+            fontWeight: 'bold'
+        });
+        this.previewPreco.setOrigin(0.5, 2.5).setDepth(101).setVisible(false);
+
+
 
         // 3. Atualizar seleção (Teclado)
         this.input.keyboard.on('keydown-ONE', () => { this.selecionada = 1; this.atualizarPreview(); });
         this.input.keyboard.on('keydown-TWO', () => { this.selecionada = 2; this.atualizarPreview(); });
         this.input.keyboard.on('keydown-THREE', () => { this.selecionada = 3; this.atualizarPreview(); });
+        this.input.keyboard.on('keydown-FOUR', () => { this.selecionada = 4; this.atualizarPreview(); });
 
-        // Clique para construir
+        // Clique 
         this.input.on('pointerdown', (pointer) => {
             // Converte a posição do clique na tela para a posição no mapa (mundo)
+            const dadosAtuais = this.dadosDefesas[this.selecionada];
             const worldPoint = pointer.positionToCamera(this.cameras.main);
-            this.tentarConstruir(worldPoint.x, worldPoint.y);
+
+            if (dadosAtuais.modo === 'construcao') {
+                // Se estiver em modo construção, chama a lógica que já temos
+                this.tentarConstruir(worldPoint.x, worldPoint.y);
+            } else {
+                // MODO COMBATE (Slot 1)
+                this.executarAcaoCombate(worldPoint);
+            }
         });
 
-        const tratarColisao = (objetoInimigo, objetoDefesa) => {
-            // Agora o código sabe quem é quem
-            const inimigo = objetoInimigo;
-            const alvo = objetoDefesa;
+        const tratarColisao = (obj1, obj2) => {
+            // Identifica dinamicamente quem é o inimigo e quem é o alvo (Torre/Processador)
+            // Se o obj1 for da classe Inimigo (ou tiver a propriedade 'cauda', etc), ele é o inimigo.
+            let inimigo, alvo;
+
+            if (obj1 instanceof Worm || obj1.constructor.name === 'Virus' || obj1.velocidade !== undefined) {
+                inimigo = obj1;
+                alvo = obj2;
+            } else {
+                inimigo = obj2;
+                alvo = obj1;
+            }
 
             if (!inimigo.active || !alvo.active) return;
 
-            console.log("Colisão com:", alvo.constructor.name); // Veja se aparece "Clicker" ou "Defesa"
+            console.log(`${inimigo.constructor.name} atacando ${alvo.constructor.name}`);
 
             if (inimigo instanceof Worm) {
-                if (!inimigo.ehSegmento) inimigo.aoColidir(alvo);
+                if (!inimigo.ehSegmento) {
+                    inimigo.aoColidir(alvo);
+                }
             } else {
+                // Vírus comum
                 if (alvo.receberDano) {
                     alvo.receberDano(inimigo.dano || 10);
                 }
@@ -89,24 +144,26 @@ export class Game extends Scene {
             }
         };
 
-        this.physics.add.overlap(this.inimigos, this.processador, (proc, inimigo) => {
-            // 1. O Processador leva dano (se você quiser)
-            if (proc.receberDano) proc.receberDano(inimigo.dano);
+        // 1. Colisão com as Defesas (Torres)
+        this.physics.add.overlap(
+            this.inimigos, 
+            this.defesas, 
+            tratarColisao, 
+            null, 
+            this
+        );
 
-            // 2. O Inimigo MORRE ao tocar o Processador
-            if (inimigo.morrer) {
-                inimigo.morrer();
-            } else if (inimigo instanceof Worm) {
-                inimigo.aoColidir(proc); // Worm tem lógica própria de morte
-            }
-        }, null, this);
-        this.physics.add.overlap(this.inimigos, this.defesas, (inimigo, defesa) => {
-            tratarColisao(defesa, inimigo);
-        }, null, this);
+        // 2. Colisão com o Processador
+        this.physics.add.overlap(
+            this.inimigos, 
+            this.processador, 
+            tratarColisao, 
+            null, 
+            this
+        );
 
 
         //testes
-        
         const debugSpawn = (classeInimigo) => {
         const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
         const inimigo = new classeInimigo(this, worldPoint.x, worldPoint.y);
@@ -116,54 +173,55 @@ export class Game extends Scene {
         this.input.keyboard.on('keydown-Q', () => debugSpawn(Worm));
         this.input.keyboard.on('keydown-E', () => debugSpawn(Trojan));
         this.input.keyboard.on('keydown-R', () => debugSpawn(ILY));
-        }
+    }
 
-    tentarConstruir(x, y) {
-        if (!this.dadosDefesas || !this.dadosDefesas[this.selecionada]) return;
+    executarAcaoCombate(worldPoint) {
+        // 1. Verificar se clicou em uma Pasta
+        const pastasNoClique = this.physics.overlapCirc(worldPoint.x, worldPoint.y, 10);
+        let interagiuComPasta = false;
 
-        const dados = this.dadosDefesas[this.selecionada];
-        
-        // 1. Calcula o Snap (Centro do bloco de 50x50)
-        const snapX = Math.floor(x / 50) * 50;
-        const snapY = Math.floor(y / 50) * 50;
-
-        // 2. Criamos um retângulo virtual que representa a nova construção
-        // Subtraímos metade da largura/altura do snap para pegar o canto superior esquerdo
-
-        const novaArea = new Phaser.Geom.Rectangle(
-            snapX - dados.largura / 2 + 1, // +1 pixel de folga
-            snapY - dados.altura / 2 + 1, // +1 pixel de folga
-            dados.largura - 2,             // -2 pixels no total
-            dados.altura - 2              // -2 pixels no total
-        );
-
-        // 3. Verificamos se essa área encosta em QUALQUER defesa já existente
-        const ocupado = this.defesas.getChildren().some(defesa => {
-            // Pegamos a área real da defesa que já está no mapa
-            const bounds = defesa.getBounds();
-            // Verificamos se há intersecção entre os dois retângulos
-            return Phaser.Geom.Intersects.RectangleToRectangle(novaArea, bounds);
+        pastasNoClique.forEach(corpo => {
+            const objeto = corpo.gameObject;
+            if (objeto instanceof Pastas) {
+                objeto.interagir(); // Supondo que você tenha esse método na classe Pastas
+                interagiuComPasta = true;
+            }
         });
 
-        if (ocupado) {
-            console.log("Espaço insuficiente! Há uma construção no caminho.");
-            return; // Sai da função e não gasta bits nem cria a torre
-        }
+        // 2. Se não clicou em pasta, verificar se tem inimigo perto para bater
+        if (!interagiuComPasta) {
+            // Aqui você pode disparar a animação de ataque do Enzinho
+            this.enzinho.atacar(); 
+            
+            // Lógica simples de dano em área perto do clique
+            const inimigosPerto = this.inimigos.getChildren().filter(inimigo => {
+                const distancia = Phaser.Math.Distance.Between(worldPoint.x, worldPoint.y, inimigo.x, inimigo.y);
+                return distancia < 50; // Raio do clique
+            });
 
-        // 4. Se chegou aqui, o espaço está livre!
-        if (this.bits >= dados.custo) {
-            let novaDefesa;
-            if (this.selecionada === 1) novaDefesa = new Clicker(this, snapX, snapY);
-            else if (this.selecionada === 2) novaDefesa = new Lixeira(this, snapX, snapY);
-            else if (this.selecionada === 3) novaDefesa = new Firewall(this, snapX, snapY);
+            inimigosPerto.forEach(inimigo => {
+                if (inimigo.receberDano) inimigo.receberDano(this.enzinho.danoAtaque);
+            });
+        }
+    }
+
+    tentarConstruir(x, y) {
+        const dados = this.dadosDefesas[this.selecionada];
+        if (!this.dadosDefesas || !this.dadosDefesas[this.selecionada]) return;
+
+        const validacao = this.validarConstrucao(x, y);
+
+        if (validacao.podeConstruir && validacao.temGrana) {
+            const novaDefesa = new dados.classe(this, validacao.x, validacao.y);
 
             if (novaDefesa) {
-                this.bits -= dados.custo;
+                this.bits -= validacao.custo;
                 this.textoBits.setText('Bits: ' + this.bits);
                 this.defesas.add(novaDefesa);
             }
         } else {
-            console.log("Bits insuficientes!");
+            if (!validacao.temGrana) console.log("Bits insuficientes!");
+            else console.log("Espaço ocupado!");
         }
     }
 
@@ -198,49 +256,96 @@ export class Game extends Scene {
         }
     }
     update() {
-        // 1. Update do Player primeiro (sempre!)
+        // Update do Player 
         if (this.enzinho && typeof this.enzinho.update === 'function') {
             this.enzinho.update();
         }
 
-        // 2. Trava de segurança para o resto do código
-        if (!this.dadosDefesas || !this.previewConstrucao) return;
+        const dadosAtuais = this.dadosDefesas[this.selecionada];
 
-        try {
-            const pointer = this.input.activePointer;
-            const worldPoint = pointer.positionToCamera(this.cameras.main);
+        // Verifica se existe e se o modo é construção
+        if (dadosAtuais && dadosAtuais.modo === 'construcao') {
+            if (!this.previewConstrucao) return;
 
-            const snapX = Math.floor(worldPoint.x / 50) * 50;
-            const snapY = Math.floor(worldPoint.y / 50) * 50;
+            try {
+                const pointer = this.input.activePointer;
+                const worldPoint = pointer.positionToCamera(this.cameras.main);
+                const validacao = this.validarConstrucao(worldPoint.x, worldPoint.y);
 
-            this.previewConstrucao.setVisible(true);
-            this.previewConstrucao.setPosition(snapX, snapY);
+                // 1. Visibilidade e Posição
+                this.previewConstrucao.setVisible(true);
+                this.previewRange.setVisible(true);
+                this.previewPreco.setVisible(true);
+                
+                this.previewConstrucao.setPosition(validacao.x, validacao.y);
+                this.previewPreco.setPosition(validacao.x, validacao.y);
+                this.previewPreco.setText(`${dadosAtuais.custo} bits`);
 
-            const dados = this.dadosDefesas[this.selecionada];
-            
-            // Retângulo de teste com 1px de folga para permitir encostar
-            const areaPreview = new Phaser.Geom.Rectangle(
-                snapX - dados.largura / 2 + 1,
-                snapY - dados.altura / 2 + 1,
-                dados.largura - 2,
-                dados.altura - 2
-            );
+                // 2. Lógica de Cores Única (Evita conflitos)
+                const podeColocar = validacao.podeConstruir && validacao.temGrana;
+                const corFeedback = podeColocar ? 0x00ff00 : 0xff0000; // Verde ou Vermelho
+                
+                // O retângulo usa a cor da torre se estiver OK, senão vermelho
+                const corPreenchimento = podeColocar ? (dadosAtuais.cor || 0xffffff) : 0xff0000;
+                this.previewConstrucao.setFillStyle(corPreenchimento, 0.5);
 
-            const ocupado = this.defesas.getChildren().some(defesa => {
-                return Phaser.Geom.Intersects.RectangleToRectangle(areaPreview, defesa.getBounds());
-            });
+                // 3. Desenho do Range
+                this.previewRange.clear();
+                this.previewRange.lineStyle(2, corFeedback, 0.5);
+                this.previewRange.fillStyle(corFeedback, 0.1);
+                
+                const raio = dadosAtuais.range || 150; 
+                this.previewRange.strokeCircle(validacao.x, validacao.y, raio);
+                this.previewRange.fillCircle(validacao.x, validacao.y, raio);
 
-            const sobreProcessador = Phaser.Geom.Intersects.RectangleToRectangle(areaPreview, this.processador.getBounds());
-
-            if (ocupado || sobreProcessador || this.bits < dados.custo) {
-                this.previewConstrucao.setFillStyle(0xff0000, 0.5);
-            } else {
-                this.previewConstrucao.setFillStyle(dados.cor, 0.5);
+            } catch (e) {
+                console.error("Erro no preview de construção:", e);
             }
-        } catch (e) {
-            // Se der qualquer erro no código de construção, o player não trava
-            console.error("Erro no preview de construção:", e);
+        }else {
+            // Esconde tudo se não estiver em modo construção
+            this.previewConstrucao.setVisible(false);
+            this.previewRange.setVisible(false);
+            this.previewPreco.setVisible(false);
         }
+    }
+
+    validarConstrucao(x, y){
+       const dados = this.dadosDefesas[this.selecionada];
+        
+        //Calcula o Snap (Centro do bloco de 50x50)
+        const gridX = Math.floor(x / 50) * 50;
+        const gridY = Math.floor(y / 50) * 50;
+
+        const snapX = gridX + (dados.largura / 2);
+        const snapY = gridY + (dados.altura / 2);
+
+        const temGrana = this.bits >= dados.custo;
+
+        //Criamos um retângulo virtual que representa a nova construção
+        const novaArea = new Phaser.Geom.Rectangle(
+            snapX - dados.largura / 2 + 1, // +1 pixel de folga
+            snapY - dados.altura / 2 + 1, // +1 pixel de folga
+            dados.largura - 2,             // -2 pixels no total
+            dados.altura - 2              // -2 pixels no total
+        );
+
+        //Verificamos se essa área encosta em algo
+        const ocupado = this.defesas.getChildren().some(defesa => {
+            // Pegamos a área real da defesa que já está no mapa
+            const bounds = defesa.getBounds();
+            // Verificamos se há intersecção entre os dois retângulos
+            return Phaser.Geom.Intersects.RectangleToRectangle(novaArea, bounds);
+        });
+
+        const sobreProcessador = Phaser.Geom.Intersects.RectangleToRectangle(novaArea, this.processador.getBounds());
+
+        return {
+            podeConstruir: !ocupado && !sobreProcessador,
+            temGrana: temGrana,
+            x: snapX,
+            y: snapY,
+            custo: dados.custo
+        };
     }
 
     // Método auxiliar para mudar o tamanho do fantasma

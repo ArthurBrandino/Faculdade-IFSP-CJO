@@ -19,12 +19,12 @@ export class Worm extends Inimigo {
         this.cauda = []; 
         this.ehSegmento = ehSegmento; 
 
-        this.historicoPosicoes = [];
-        if (this.ehSegmento) {
-            this.tornarImortal();
+        if (!ehSegmento) {
+            this.historicoPosicoes = [];
+            this.adicionarSegmentos(4);
         }
         else{
-            this.adicionarSegmentos(4);
+            this.tornarImortal();
         }
     }
 
@@ -80,43 +80,58 @@ export class Worm extends Inimigo {
         }
     }
 
-    aoColidir(alvo) {
-        // 1. Causa dano ao alvo (seja Processador ou Defesa)
-        if (alvo.receberDano) {
+    promoverProximoSegmento(alvo = null) {
+        if (this.estaMorrendo) return;
+        this.estaMorrendo = true;
+
+        if (this.cauda && this.cauda.length > 0) {
+            const novaCabeca = this.cauda.shift();
+
+            if (novaCabeca && novaCabeca.active) {
+                novaCabeca.cauda = this.cauda;
+                novaCabeca.historicoPosicoes = this.historicoPosicoes;
+                novaCabeca.ehSegmento = false;
+                novaCabeca.tornarVulneravel();
+
+                // Se o alvo for o processador, a nova cabeça assume a posição da antiga
+                if (alvo === this.scene.processador) {
+                    novaCabeca.x = this.x;
+                    novaCabeca.y = this.y;
+                }
+            }
+        }
+        this.cauda = [];
+    }
+
+   aoColidir(alvo) {
+        if (this.estaMorrendo) return;
+
+        if (alvo && alvo.receberDano) {
             alvo.receberDano(this.dano);
         }
 
-        // 2. Se o alvo for destruído pelo meu impacto, eu me multiplico!
-        // Checamos se o HP do alvo chegou a 0 após o meu hit
-        if (alvo.hp <= 0) {
-            console.log("Worm consumiu a construção e cresceu!");
-            this.adicionarSegmentos(5); // Ganha +5 quadradinhos
-        }
-
-        // 3. A cabeça atual morre e passa o bastão para o próximo segmento
+        // Passa a liderança (passando o alvo para o ajuste de posição)
+        this.promoverProximoSegmento(alvo);
         this.morrer();
     }
 
-    morrer() {
-        if (this.cauda.length > 0) {
-            const novaCabeca = this.cauda.shift();
-            
-            if (novaCabeca && novaCabeca.active) {
-                novaCabeca.cauda = this.cauda;
-                novaCabeca.ehSegmento = false; 
-                novaCabeca.historicoPosicoes = this.historicoPosicoes;
-                novaCabeca.tornarVulneravel();
-
-                this.scene.tweens.add({
-                    targets: novaCabeca,
-                    scale: 1.2,
-                    duration: 100,
-                    yoyo: true
-                });
-            }
+    receberDano(quantidade) {
+        this.hp -= quantidade;
+        
+        if (this.hp <= 0 && !this.estaMorrendo) {
+            // Se morreu por tiro, tentamos promover a cauda ANTES de destruir
+            this.promoverProximoSegmento(); 
+            this.morrer();
         }
+    }
 
-        this.cauda = [];
+    morrer() {
+       if (this.cauda.length === 0 && this.ehSegmento === false) {
+            console.log("Worm totalmente eliminado!");
+        }
+        
+        // Deletamos a cabeça atual, mas o objeto 'novaCabeca' 
+        // já recebeu a referência da lista 'cauda' no aoColidir ou aqui
         super.morrer();
     }
 }

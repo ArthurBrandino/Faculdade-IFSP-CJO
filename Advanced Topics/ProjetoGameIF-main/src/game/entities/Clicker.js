@@ -4,16 +4,27 @@ import { Worm } from "../entities/Worm.js";
 const COR_CLICKER = 0xeeeeee;
 
 export class Clicker extends Defesa {
-    constructor(scene, x, y) {
-        const largura = 100;
-        const altura = 100;
-        const vida = 100;     // HP
-        const taxaTiro = 20000; // SPEED (intervalo entre tiros)
-        const dano = 1;       // DANO
-        const alcance = 300;  // RANGE
-        const custo = 50;     // CUSTO
+    static get CUSTO() { return 50; }
+    static get RANGE() { return 300; }
+    static get LARGURA() { return 100; }
+    static get ALTURA() { return 100; }
+    static get VIDA() { return 100; }
+    static get TAXA_TIRO() { return 2000; }
+    static get DANO() { return 1; }
 
-        super(scene, x, y, largura, altura, vida, taxaTiro, dano, alcance, custo);
+    constructor(scene, x, y) {
+        super(
+            scene, 
+            x, 
+            y, 
+            Clicker.LARGURA, 
+            Clicker.ALTURA, 
+            Clicker.VIDA, 
+            Clicker.TAXA_TIRO, 
+            Clicker.DANO, 
+            Clicker.RANGE, 
+            Clicker.CUSTO
+        );
         this.setFillStyle(COR_CLICKER);
         this.proximoTiro = 0;
     }
