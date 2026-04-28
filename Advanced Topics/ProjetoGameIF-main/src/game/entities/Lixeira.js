@@ -30,7 +30,6 @@ export class Lixeira extends Defesa {
         this.cronometro = 0;
         
         this.setFillStyle(COR_LIXEIRA);
-        this.proximoTiro = 0;
     }
 
     update(time, delta) {

@@ -9,6 +9,7 @@ import { WaveManager } from '../logic/WaveManager.js';
 import { WAVES } from '../logic/WaveData.js';
 import { Clicker } from '../entities/Clicker.js';
 import { Lixeira } from '../entities/Lixeira.js';
+import { Firewall } from '../entities/Firewall.js';
 
 export class Game extends Scene {
     constructor() {
@@ -64,16 +65,15 @@ export class Game extends Scene {
                 modo: 'construcao',
                 classe: Lixeira 
             },
-             /*4: { 
+             4: { 
                 nome: 'Firewall', 
                 largura: Firewall.LARGURA, 
                 altura: Firewall.ALTURA, 
                 cor: Firewall.COR, 
                 custo: Firewall.CUSTO, 
-                range: Firewall.RANGE, 
                 modo: 'construcao',
                 classe: Firewall 
-            }*/
+            }
         };
 
         this.selecionada = 1;
@@ -116,8 +116,6 @@ export class Game extends Scene {
         });
 
         const tratarColisao = (obj1, obj2) => {
-            // Identifica dinamicamente quem é o inimigo e quem é o alvo (Torre/Processador)
-            // Se o obj1 for da classe Inimigo (ou tiver a propriedade 'cauda', etc), ele é o inimigo.
             let inimigo, alvo;
 
             if (obj1 instanceof Worm || obj1.constructor.name === 'Virus' || obj1.velocidade !== undefined) {
@@ -130,21 +128,18 @@ export class Game extends Scene {
 
             if (!inimigo.active || !alvo.active) return;
 
-            console.log(`${inimigo.constructor.name} atacando ${alvo.constructor.name}`);
-
             if (inimigo instanceof Worm) {
                 if (!inimigo.ehSegmento) {
-                    inimigo.aoColidir(alvo);
+                    inimigo.aoColidir(alvo); 
                 }
             } else {
                 // Vírus comum
                 if (alvo.receberDano) {
-                    alvo.receberDano(inimigo.dano || 10);
+                    alvo.receberDano(inimigo.dano || 10, inimigo); 
                 }
                 if (inimigo.morrer) inimigo.morrer();
             }
         };
-
         // 1. Colisão com as Defesas (Torres)
         this.physics.add.overlap(
             this.inimigos, 
@@ -286,7 +281,6 @@ export class Game extends Scene {
 
                 // 1. Visibilidade e Posição
                 this.previewConstrucao.setVisible(true);
-                this.previewRange.setVisible(true);
                 this.previewPreco.setVisible(true);
                 
                 this.previewConstrucao.setPosition(validacao.x, validacao.y);
@@ -302,13 +296,18 @@ export class Game extends Scene {
                 this.previewConstrucao.setFillStyle(corPreenchimento, 0.5);
 
                 // 3. Desenho do Range
-                this.previewRange.clear();
-                this.previewRange.lineStyle(2, corFeedback, 0.5);
-                this.previewRange.fillStyle(corFeedback, 0.1);
-                
-                const raio = dadosAtuais.range || 150; 
-                this.previewRange.strokeCircle(validacao.x, validacao.y, raio);
-                this.previewRange.fillCircle(validacao.x, validacao.y, raio);
+                if(dadosAtuais.nome != 'Firewall')
+                {
+                    this.previewRange.setVisible(true);
+                    this.previewRange.clear();
+                    this.previewRange.lineStyle(2, corFeedback, 0.5);
+                    this.previewRange.fillStyle(corFeedback, 0.1);
+                    const raio = dadosAtuais.range || 150; 
+                    this.previewRange.strokeCircle(validacao.x, validacao.y, raio);
+                    this.previewRange.fillCircle(validacao.x, validacao.y, raio);
+                }
+                else    
+                    this.previewRange.setVisible(false);
 
             } catch (e) {
                 console.error("Erro no preview de construção:", e);

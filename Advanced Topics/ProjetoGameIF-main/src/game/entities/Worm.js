@@ -107,10 +107,19 @@ export class Worm extends Inimigo {
         if (this.estaMorrendo) return;
 
         if (alvo && alvo.receberDano) {
-            alvo.receberDano(this.dano);
+            const hpAntes = alvo.hp;
+            
+            alvo.receberDano(this.dano, this);
+
+            if (alvo.hp <= 0 && alvo !== this.scene.processador) {
+                console.log("Worm devorou a defesa e cresceu!");
+                
+                if (this.cauda.length > 0) {
+                    this.adicionarSegmentos(5); 
+                }
+            }
         }
 
-        // Passa a liderança (passando o alvo para o ajuste de posição)
         this.promoverProximoSegmento(alvo);
         this.morrer();
     }
