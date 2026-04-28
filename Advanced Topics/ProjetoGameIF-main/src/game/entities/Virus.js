@@ -14,10 +14,7 @@ export class Inimigo extends Phaser.GameObjects.Rectangle {
         this.amplitude = amp;
         this.alvo = scene.processador; // Todos focam no processador por padrão
 
-        this.setInteractive();
-        this.on('pointerdown', () => {
-            this.receberClique();
-        });
+        
     }
 
     preUpdate(time, delta) {
@@ -35,27 +32,24 @@ export class Inimigo extends Phaser.GameObjects.Rectangle {
         }
     }
 
-    receberClique() {
-        this.hp -= 1; 
-        
+    
+
+    receberDano(quantidade) {
+        this.hp -= quantidade;
+
         this.scene.tweens.add({
             targets: this,
             alpha: 0.5,
             duration: 50,
             yoyo: true
         });
-
-        if (this.hp <= 0)   this.morrer();
-    }
-
-    receberDano(quantidade) {
-        this.hp -= quantidade;
+        
         if (this.hp <= 0) {
             this.morrer();
         }
     }
 
-    morrer() {
+    morrer(gerarFilhos = true) {
         if (this.scene.adicionarBits) { 
             let bits = Phaser.Math.Between(1, 5);
             this.scene.adicionarBits(bits);

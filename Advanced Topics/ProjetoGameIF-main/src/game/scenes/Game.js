@@ -8,6 +8,7 @@ import { ILY } from "../entities/ILY.js";
 import { WaveManager } from '../logic/WaveManager.js';
 import { WAVES } from '../logic/WaveData.js';
 import { Clicker } from '../entities/Clicker.js';
+import { Lixeira } from '../entities/Lixeira.js';
 
 export class Game extends Scene {
     constructor() {
@@ -53,7 +54,7 @@ export class Game extends Scene {
                 modo: 'construcao',
                 classe: Clicker 
             },
-            /*3: { 
+           3: { 
                 nome: 'Lixeira', 
                 largura: Lixeira.LARGURA, 
                 altura: Lixeira.ALTURA, 
@@ -63,7 +64,7 @@ export class Game extends Scene {
                 modo: 'construcao',
                 classe: Lixeira 
             },
-            4: { 
+             /*4: { 
                 nome: 'Firewall', 
                 largura: Firewall.LARGURA, 
                 altura: Firewall.ALTURA, 
@@ -109,7 +110,7 @@ export class Game extends Scene {
                 // Se estiver em modo construção, chama a lógica que já temos
                 this.tentarConstruir(worldPoint.x, worldPoint.y);
             } else {
-                // MODO COMBATE (Slot 1)
+                // MODO COMBATE 
                 this.executarAcaoCombate(worldPoint);
             }
         });
@@ -173,6 +174,7 @@ export class Game extends Scene {
         this.input.keyboard.on('keydown-Q', () => debugSpawn(Worm));
         this.input.keyboard.on('keydown-E', () => debugSpawn(Trojan));
         this.input.keyboard.on('keydown-R', () => debugSpawn(ILY));
+        this.input.keyboard.on('keydown-T', () => this.adicionarBits(100));
     }
 
     executarAcaoCombate(worldPoint) {
@@ -191,17 +193,27 @@ export class Game extends Scene {
         // 2. Se não clicou em pasta, verificar se tem inimigo perto para bater
         if (!interagiuComPasta) {
             // Aqui você pode disparar a animação de ataque do Enzinho
-            this.enzinho.atacar(); 
+            //this.enzinho.atacar(); 
             
-            // Lógica simples de dano em área perto do clique
-            const inimigosPerto = this.inimigos.getChildren().filter(inimigo => {
+            const inimigosNoRaio = this.inimigos.getChildren().filter(inimigo => {
                 const distancia = Phaser.Math.Distance.Between(worldPoint.x, worldPoint.y, inimigo.x, inimigo.y);
-                return distancia < 50; // Raio do clique
+                
+                const alvoValido = inimigo instanceof Worm ? !inimigo.ehSegmento : true;
+
+                return distancia < 50 && inimigo.active && alvoValido;
             });
 
-            inimigosPerto.forEach(inimigo => {
-                if (inimigo.receberDano) inimigo.receberDano(this.enzinho.danoAtaque);
+            inimigosNoRaio.sort((a, b) => {
+                const distA = Phaser.Math.Distance.Between(worldPoint.x, worldPoint.y, a.x, a.y);
+                const distB = Phaser.Math.Distance.Between(worldPoint.x, worldPoint.y, b.x, b.y);
+                return distA - distB;
             });
+
+            const alvoUnico = inimigosNoRaio[0];
+
+            if (alvoUnico && alvoUnico.receberDano) {
+                alvoUnico.receberDano(this.enzinho.danoAtaque);
+            }
         }
     }
 
@@ -309,10 +321,11 @@ export class Game extends Scene {
         }
     }
 
-    validarConstrucao(x, y){
-       const dados = this.dadosDefesas[this.selecionada];
-        
-        //Calcula o Snap (Centro do bloco de 50x50)
+    validarConstrucao(x, y) {
+        const dados = this.dadosDefesas[this.selecionada];
+        if (!dados) return { podeConstruir: false };
+
+        // Calcula o Snap (Centro do bloco de 50x50)
         const gridX = Math.floor(x / 50) * 50;
         const gridY = Math.floor(y / 50) * 50;
 
@@ -321,20 +334,24 @@ export class Game extends Scene {
 
         const temGrana = this.bits >= dados.custo;
 
-        //Criamos um retângulo virtual que representa a nova construção
+        // Retângulo virtual da nova construção que você quer colocar
         const novaArea = new Phaser.Geom.Rectangle(
-            snapX - dados.largura / 2 + 1, // +1 pixel de folga
-            snapY - dados.altura / 2 + 1, // +1 pixel de folga
-            dados.largura - 2,             // -2 pixels no total
-            dados.altura - 2              // -2 pixels no total
+            snapX - dados.largura / 2 + 1, 
+            snapY - dados.altura / 2 + 1, 
+            dados.largura - 2, 
+            dados.altura - 2
         );
 
-        //Verificamos se essa área encosta em algo
+        // Verificamos se essa área encosta em defesas já existentes
         const ocupado = this.defesas.getChildren().some(defesa => {
-            // Pegamos a área real da defesa que já está no mapa
-            const bounds = defesa.getBounds();
-            // Verificamos se há intersecção entre os dois retângulos
-            return Phaser.Geom.Intersects.RectangleToRectangle(novaArea, bounds);
+            const areaLogicaExistente = new Phaser.Geom.Rectangle(
+                defesa.x - defesa.width / 2 + 1,
+                defesa.y - defesa.height / 2 + 1,
+                defesa.width - 2,
+                defesa.height - 2
+            );
+
+            return Phaser.Geom.Intersects.RectangleToRectangle(novaArea, areaLogicaExistente);
         });
 
         const sobreProcessador = Phaser.Geom.Intersects.RectangleToRectangle(novaArea, this.processador.getBounds());

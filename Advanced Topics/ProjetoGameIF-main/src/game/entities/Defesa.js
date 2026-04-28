@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { Worm } from "../entities/Worm.js";
 
 export class Defesa extends Phaser.GameObjects.Rectangle {
     constructor(scene, x, y, largura, altura, hp, speed, dano, range, custo) {
@@ -39,6 +40,30 @@ export class Defesa extends Phaser.GameObjects.Rectangle {
         if (this.hp <= 0) {
             this.destruir();
         }
+    }
+
+    procurarAlvo() {
+        //Pega todos os inimigos do grupo
+        const listaInimigos = this.scene.inimigos.getChildren();
+
+        return listaInimigos.find(inimigo => {
+            // 2. Filtro de Atividade
+            if (!inimigo || !inimigo.active || !inimigo.body || inimigo.estaPreso) return false;
+
+
+            // 3. Filtro de Distância
+            const distancia = Phaser.Math.Distance.Between(this.x, this.y, inimigo.x, inimigo.y);
+            if (distancia > this.range) return false;
+
+            // 4. Filtro de Segmento (Worm)
+            // Usamos uma verificação mais simples: se tem a propriedade 'ehSegmento' e ela é true, ignora
+            if (inimigo.ehSegmento === true) {
+                return false;
+            }
+
+            // 5. Se passou por tudo acima, este é um alvo válido!
+            return true; 
+        });
     }
 
     atualizarBarraVida() {

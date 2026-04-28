@@ -9,6 +9,7 @@ export class Player extends Phaser.GameObjects.Rectangle {
         
         this.body.setCollideWorldBounds(true);
         this.speed = 300;
+        this.danoAtaque = 1;
         this.cursors = scene.input.keyboard.createCursorKeys();
         this.teclasWASD = scene.input.keyboard.addKeys({
             up: Phaser.Input.Keyboard.KeyCodes.W,

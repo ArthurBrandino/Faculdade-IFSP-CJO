@@ -21,15 +21,18 @@ export class Trojan extends Inimigo {
         super.preUpdate(time, delta);
     }
 
-    morrer() {
-        let quantidade = Phaser.Math.Between(2, 4);
-        for (let i = 0; i < quantidade; i++) {
-            const wormFilho = new Worm(this.scene, this.x, this.y);
-        
-            if (this.scene.inimigos) {
-                this.scene.inimigos.add(wormFilho);
+    morrer(gerarFilhos = true) {
+        if(gerarFilhos)
+        {
+            let quantidade = Phaser.Math.Between(2, 4);
+            for (let i = 0; i < quantidade; i++) {
+                const wormFilho = new Worm(this.scene, this.x, this.y);
+            
+                if (this.scene.inimigos) {
+                    this.scene.inimigos.add(wormFilho);
+                }
             }
         }
-        super.morrer();
+        super.morrer(gerarFilhos);
     }
 }
