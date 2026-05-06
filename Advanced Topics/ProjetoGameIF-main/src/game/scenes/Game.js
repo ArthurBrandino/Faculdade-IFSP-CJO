@@ -270,54 +270,53 @@ export class Game extends Scene {
 
         const dadosAtuais = this.dadosDefesas[this.selecionada];
 
-        // Verifica se existe e se o modo é construção
-        if (dadosAtuais && dadosAtuais.modo === 'construcao') {
-            if (!this.previewConstrucao) return;
-
-            try {
-                const pointer = this.input.activePointer;
-                const worldPoint = pointer.positionToCamera(this.cameras.main);
-                const validacao = this.validarConstrucao(worldPoint.x, worldPoint.y);
-
-                // 1. Visibilidade e Posição
-                this.previewConstrucao.setVisible(true);
-                this.previewPreco.setVisible(true);
-                
-                this.previewConstrucao.setPosition(validacao.x, validacao.y);
-                this.previewPreco.setPosition(validacao.x, validacao.y);
-                this.previewPreco.setText(`${dadosAtuais.custo} bits`);
-
-                // 2. Lógica de Cores Única (Evita conflitos)
-                const podeColocar = validacao.podeConstruir && validacao.temGrana;
-                const corFeedback = podeColocar ? 0x00ff00 : 0xff0000; // Verde ou Vermelho
-                
-                // O retângulo usa a cor da torre se estiver OK, senão vermelho
-                const corPreenchimento = podeColocar ? (dadosAtuais.cor || 0xffffff) : 0xff0000;
-                this.previewConstrucao.setFillStyle(corPreenchimento, 0.5);
-
-                // 3. Desenho do Range
-                if(dadosAtuais.nome != 'Firewall')
-                {
-                    this.previewRange.setVisible(true);
-                    this.previewRange.clear();
-                    this.previewRange.lineStyle(2, corFeedback, 0.5);
-                    this.previewRange.fillStyle(corFeedback, 0.1);
-                    const raio = dadosAtuais.range || 150; 
-                    this.previewRange.strokeCircle(validacao.x, validacao.y, raio);
-                    this.previewRange.fillCircle(validacao.x, validacao.y, raio);
-                }
-                else    
-                    this.previewRange.setVisible(false);
-
-            } catch (e) {
-                console.error("Erro no preview de construção:", e);
-            }
-        }else {
-            // Esconde tudo se não estiver em modo construção
-            this.previewConstrucao.setVisible(false);
-            this.previewRange.setVisible(false);
-            this.previewPreco.setVisible(false);
+        
+        if (!dadosAtuais || dadosAtuais.modo === 'acao') {
+            if (this.previewConstrucao) this.previewConstrucao.setVisible(false);
+            if (this.previewRange) this.previewRange.setVisible(false);
+            if (this.previewPreco) this.previewPreco.setVisible(false);
+            return; 
         }
+
+        try {
+            const pointer = this.input.activePointer;
+            const worldPoint = pointer.positionToCamera(this.cameras.main);
+            const validacao = this.validarConstrucao(worldPoint.x, worldPoint.y);
+
+            // 1. Visibilidade e Posição
+            this.previewConstrucao.setVisible(true);
+            this.previewPreco.setVisible(true);
+            
+            this.previewConstrucao.setPosition(validacao.x, validacao.y);
+            this.previewPreco.setPosition(validacao.x, validacao.y);
+            this.previewPreco.setText(`${dadosAtuais.custo} bits`);
+
+            // 2. Lógica de Cores Única (Evita conflitos)
+            const podeColocar = validacao.podeConstruir && validacao.temGrana;
+            const corFeedback = podeColocar ? 0x00ff00 : 0xff0000; // Verde ou Vermelho
+            
+            // O retângulo usa a cor da torre se estiver OK, senão vermelho
+            const corPreenchimento = podeColocar ? (dadosAtuais.cor || 0xffffff) : 0xff0000;
+            this.previewConstrucao.setFillStyle(corPreenchimento, 0.5);
+
+            // 3. Desenho do Range
+            if(dadosAtuais.nome != 'Firewall')
+            {
+                this.previewRange.setVisible(true);
+                this.previewRange.clear();
+                this.previewRange.lineStyle(2, corFeedback, 0.5);
+                this.previewRange.fillStyle(corFeedback, 0.1);
+                const raio = dadosAtuais.range || 150; 
+                this.previewRange.strokeCircle(validacao.x, validacao.y, raio);
+                this.previewRange.fillCircle(validacao.x, validacao.y, raio);
+            }
+            else    
+                this.previewRange.setVisible(false);
+
+        } catch (e) {
+            console.error("Erro no preview de construção:", e);
+        }
+        
     }
 
     validarConstrucao(x, y) {
@@ -364,10 +363,21 @@ export class Game extends Scene {
         };
     }
 
-    // Método auxiliar para mudar o tamanho do fantasma
     atualizarPreview() {
         const dados = this.dadosDefesas[this.selecionada];
-        this.previewConstrucao.setSize(dados.largura, dados.altura);
-        this.previewConstrucao.setFillStyle(dados.cor, 0.5);
+        
+        // Se for modo combate (ou dados não existirem), esconde o preview e sai da função
+        if (!dados || dados.modo === 'acao') {
+            this.previewConstrucao.setVisible(false);
+            this.previewRange.setVisible(false);
+            this.previewPreco.setVisible(false);
+            return;
+        }
+
+        // Só define tamanho se as propriedades existirem
+        if (dados.largura && dados.altura) {
+            this.previewConstrucao.setSize(dados.largura, dados.altura);
+            this.previewConstrucao.setFillStyle(dados.cor || 0xffffff, 0.5);
+        }
     }
 }
