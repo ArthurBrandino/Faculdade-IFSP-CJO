@@ -1,6 +1,6 @@
 import { Defesa } from './Defesa.js';
 
-const COR_CLICKER = 0xeeeeee;
+
 
 export class Clicker extends Defesa {
     static get CUSTO() { return 50; }
@@ -18,13 +18,14 @@ export class Clicker extends Defesa {
             y, 
             Clicker.LARGURA, 
             Clicker.ALTURA, 
+            'spr_clicker',
             Clicker.VIDA, 
             Clicker.TAXA_TIRO, 
             Clicker.DANO, 
             Clicker.RANGE, 
             Clicker.CUSTO
         );
-        this.setFillStyle(COR_CLICKER);
+        
         this.proximoTiro = 0;
     }
 

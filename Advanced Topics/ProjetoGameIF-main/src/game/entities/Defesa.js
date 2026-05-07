@@ -1,14 +1,17 @@
 import Phaser from 'phaser';
 import { Worm } from "../entities/Worm.js";
 
-export class Defesa extends Phaser.GameObjects.Rectangle {
-    constructor(scene, x, y, largura, altura, hp, speed, dano, range, custo) {
+export class Defesa extends Phaser.GameObjects.Sprite {
+    constructor(scene, x, y, largura, altura, spriteKey, hp, speed, dano, range, custo) {
         // Agora largura e altura vêm do filho (Clicker, Firewall, etc)
-        super(scene, x, y, largura, altura, 0xeeeeee);
+        super(scene, x, y, spriteKey);
         
         scene.add.existing(this);
         // static: true garante que o corpo físico não se mova
-        scene.physics.add.existing(this, true); 
+        scene.physics.add.existing(this, true);
+        this.body.setSize(largura, altura);
+        
+        this.setDisplaySize(largura, altura);
         
         this.hp = hp;
         this.maxHp = hp;
@@ -29,11 +32,13 @@ export class Defesa extends Phaser.GameObjects.Rectangle {
         // Feedback visual de piscar
         this.scene.tweens.add({
             targets: this,
-            fillAlpha: 0.5,
-            duration: 30,
+            alpha: 0.5,       
+            tint: 0xffffff, 
+            duration: 50,
             yoyo: true,
             onComplete: () => {
-                this.fillAlpha = 1; // Garantia extra de que voltará ao normal
+                this.alpha = 1;
+                this.clearTint(); 
             }
         });
 

@@ -1,11 +1,14 @@
 import Phaser from 'phaser';
 
-export class Inimigo extends Phaser.GameObjects.Rectangle {
-    constructor(scene, x, y, largura, altura, hp, speed, dano, freq = 0, amp = 0) {
-        super(scene, x, y, largura, altura);
+export class Inimigo extends Phaser.GameObjects.Sprite {
+    constructor(scene, x, y, largura, altura, spriteKey, hp, speed, dano, freq = 0, amp = 0) {
+        super(scene, x, y, spriteKey);
         
         scene.add.existing(this);
         scene.physics.add.existing(this);
+        this.body.setSize(largura, altura);
+        
+        this.setDisplaySize(largura, altura);
         
         this.hp = hp;
         this.speed = speed;

@@ -1,8 +1,6 @@
 import { Defesa } from './Defesa.js';
 import { Worm } from "../entities/Worm.js";
 
-const COR_FIREWALL = 0xe74c3c;
-
 export class Firewall extends Defesa {
     static get CUSTO() { return 10; }
     static get LARGURA() { return 50; }
@@ -16,11 +14,11 @@ export class Firewall extends Defesa {
             y, 
             Firewall.LARGURA, 
             Firewall.ALTURA, 
+            'spr_firewall',
             Firewall.VIDA,  
             Firewall.CUSTO
         );
         this.danoCritico = 10;
-        this.setFillStyle(COR_FIREWALL);
     }
 
     receberDano(quantidade, atacante){

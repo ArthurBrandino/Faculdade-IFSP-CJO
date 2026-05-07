@@ -32,9 +32,13 @@ export class Preloader extends Scene
         //  Load the assets for the game - Replace with your own assets
         this.load.setPath('assets');
 
-        this.load.image('logo', 'logo.png');
+        this.load.image('logo', 'logo.png'); // Busca em assets/logo.png
+        this.load.image('spr_clicker', 'defesas/Clicker_Sprite.png'); // Busca em assets/defesas/...
+        this.load.image('spr_firewall', 'defesas/Firewall_Sprite.png');
+        this.load.image('spr_worm', 'inimigos/Worm_Sprite.png');
+        this.load.image('spr_letter', 'inimigos/Letter_Sprite.png');
+        this.load.image('spr_folder', 'mapa/Folder_Sprite.png');
     }
-
     create ()
     {
         //  When all the assets have loaded, it's often worth creating global objects here that the rest of the game can use.
