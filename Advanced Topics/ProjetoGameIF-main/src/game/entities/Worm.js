@@ -1,7 +1,5 @@
 import { Inimigo } from "./Virus";
 
-const COR_WORM = 0x00ff00;
-
 export class Worm extends Inimigo {
     constructor(scene, x, y, ehSegmento = false) {
         // Atributos base
@@ -13,27 +11,31 @@ export class Worm extends Inimigo {
         const frequencia = 0.01;
         const amplitude = 2.5;
 
-        super(scene, x, y, largura, altura, vida, velocidade, dano, frequencia, amplitude);
+        super(scene, x, y, largura, altura, 'spr_worm', vida, velocidade, dano, frequencia, amplitude);
 
-        this.setFillStyle(COR_WORM);
+        
         this.cauda = []; 
         this.ehSegmento = ehSegmento; 
 
         if (!ehSegmento) {
+            this.setFrame(3);
             this.historicoPosicoes = [];
             this.adicionarSegmentos(4);
         }
         else{
+            this.setFrame(2);
             this.tornarImortal();
         }
+
+        this.setDisplaySize(altura, largura);
     }
+
 
     tornarImortal() {
         this.disableInteractive(); // Não aceita cliques
         if (this.body) {
             this.body.enable = false; // Desativa física (não colide com nada)
         }
-        this.setAlpha(0.6); // Feedback visual: cauda é mais transparente
     }
 
     tornarVulneravel() {
@@ -88,6 +90,7 @@ export class Worm extends Inimigo {
             const novaCabeca = this.cauda.shift();
 
             if (novaCabeca && novaCabeca.active) {
+                novaCabeca.setFrame(3);
                 novaCabeca.cauda = this.cauda;
                 novaCabeca.historicoPosicoes = this.historicoPosicoes;
                 novaCabeca.ehSegmento = false;

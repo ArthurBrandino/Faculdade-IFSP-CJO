@@ -6,8 +6,8 @@ export class ILY extends Inimigo {
         const velocidade = 80;
         const vida = 1;
         const dano = 20;
-        const largura = 60; 
-        const altura = 50;
+        const largura = 50; 
+        const altura = 35;
         const frequencia = 0.005;
         const amplitude = 4;
 

@@ -29,6 +29,15 @@ export class Game extends Scene {
         //Camera
         this.cameras.main.startFollow(this.enzinho, true); // O 'true' ativa o arredondamento de pixels
         this.cameras.main.centerOn(1000, 1000); // Força a câmera a olhar para o centro no início
+        this.cameras.main.setViewport(450, 100, 1000, 700);
+        this.cameras.main.setBackgroundColor('#000b00'); // Fundo da "aba"
+        
+        
+        // 2. Cria uma Câmera para o HUD (Fica por cima de tudo)
+        // Essa câmera ocupa a tela inteira para desenhar as abas ao redor
+        this.hudCamera = this.cameras.add(50, 50, 250, 75).setName('HUD');
+        this.hudCamera.setBackgroundColor('#000b00');
+        
 
         //Moeda do Jogo
         this.bits = 0;
@@ -38,8 +47,8 @@ export class Game extends Scene {
         this.inimigos = this.physics.add.group({runChildUpdate: true });
 
         //Gerenciamento de Ondas
-        this.gerenciadorOndas = new WaveManager(this, WAVES);
-        this.gerenciadorOndas.iniciarSistema();
+        //this.gerenciadorOndas = new WaveManager(this, WAVES);
+        //this.gerenciadorOndas.iniciarSistema();
 
         this.defesas = this.add.group({ runChildUpdate: true });
 
@@ -169,6 +178,7 @@ export class Game extends Scene {
         this.input.keyboard.on('keydown-Q', () => debugSpawn(Worm));
         this.input.keyboard.on('keydown-E', () => debugSpawn(Trojan));
         this.input.keyboard.on('keydown-R', () => debugSpawn(ILY));
+        this.input.keyboard.on('keydown-P', () => debugSpawn(Pastas));
         this.input.keyboard.on('keydown-T', () => this.adicionarBits(100));
     }
 

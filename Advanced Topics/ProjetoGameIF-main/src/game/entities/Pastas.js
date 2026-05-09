@@ -1,7 +1,10 @@
-export class Pastas extends Phaser.GameObjects.Rectangle {    
+export class Pastas extends Phaser.GameObjects.Sprite {    
     constructor(scene, x, y) {
-        super(scene, x, y, 50, 50, 0xffff00);
+        const largura = 50;
+        const altura = 50;
+        super(scene, x, y, 'spr_folder', largura, altura);
         
+        this.setFrame(1);
         this.vida = Phaser.Math.Between(3, 6); // vida aleatoria entre 3 e 6
 
         scene.add.existing(this);
@@ -27,7 +30,7 @@ export class Pastas extends Phaser.GameObjects.Rectangle {
                 yoyo: true // Volta ao tamanho original
             });
 
-
+            if(this.vida == 1) this.setFrame(0);
             if(this.vida <= 0)  this.destroy(); 
         } else {
             console.log("Muito longe para minerar!");

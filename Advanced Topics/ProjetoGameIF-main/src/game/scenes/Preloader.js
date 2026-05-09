@@ -35,9 +35,15 @@ export class Preloader extends Scene
         this.load.image('logo', 'logo.png'); // Busca em assets/logo.png
         this.load.image('spr_clicker', 'defesas/Clicker_Sprite.png'); // Busca em assets/defesas/...
         this.load.image('spr_firewall', 'defesas/Firewall_Sprite.png');
-        this.load.image('spr_worm', 'inimigos/Worm_Sprite.png');
+        this.load.spritesheet('spr_worm', 'inimigos/Worm_Sprite.png', { 
+            frameWidth: 16, 
+            frameHeight: 16 
+        });
         this.load.image('spr_letter', 'inimigos/Letter_Sprite.png');
-        this.load.image('spr_folder', 'mapa/Folder_Sprite.png');
+        this.load.spritesheet('spr_folder', 'mapa/Folder_Sprite.png', { 
+            frameWidth: 32, 
+            frameHeight: 32 
+        });
     }
     create ()
     {

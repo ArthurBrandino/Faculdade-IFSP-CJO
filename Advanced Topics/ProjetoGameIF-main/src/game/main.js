@@ -7,8 +7,8 @@ import { AUTO, Game } from 'phaser';
 
 const config = {
     type: AUTO,
-    width: 1024,
-    height: 768,
+    width: window.innerWidth, 
+    height: window.innerHeight,
     parent: 'game-container',
     backgroundColor: '#028af8',
     scale: {
