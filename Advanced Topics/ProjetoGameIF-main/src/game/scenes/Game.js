@@ -16,35 +16,47 @@ export class Game extends Scene {
         super('Game'); 
     }
     create() {
-        //Mapa
+            // 1. CONFIGURAÇÃO DO MUNDO E JOGO
         this.physics.world.setBounds(0, 0, 2000, 2000);
-
-        //Player
         this.enzinho = new Player(this, 1100, 1100);
-
-        //Processador
         this.processador = new Processador(this, 1000, 1000);
         this.physics.add.collider(this.enzinho, this.processador);
+        this.inimigos = this.physics.add.group({runChildUpdate: true });
 
-        //Camera
-        this.cameras.main.startFollow(this.enzinho, true); // O 'true' ativa o arredondamento de pixels
-        this.cameras.main.centerOn(1000, 1000); // Força a câmera a olhar para o centro no início
-        this.cameras.main.setViewport(450, 100, 1000, 700);
-        this.cameras.main.setBackgroundColor('#000b00'); // Fundo da "aba"
-        
-        
-        // 2. Cria uma Câmera para o HUD (Fica por cima de tudo)
-        // Essa câmera ocupa a tela inteira para desenhar as abas ao redor
-        this.hudCamera = this.cameras.add(50, 50, 250, 75).setName('HUD');
-        this.hudCamera.setBackgroundColor('#000b00');
-        
-
-        //Moeda do Jogo
+        // 2. ELEMENTOS DE INTERFACE (HUD)
         this.bits = 0;
         this.textoBits = this.add.text(850, 16, 'Bits: 0', { fontSize: '32px', fill: '#fff' });
         this.textoBits.setScrollFactor(0);
+        
+        // Supondo que sua barra de vida seja um objeto (imagem ou container)
+        // this.barraVida = ... 
 
-        this.inimigos = this.physics.add.group({runChildUpdate: true });
+        // 3. CONFIGURAÇÃO DA CÂMERA PRINCIPAL (JOGO)
+        this.cameras.main.startFollow(this.enzinho, true);
+        this.cameras.main.setViewport(450, 100, 1000, 700);
+        this.cameras.main.setBackgroundColor('#000b00');
+        this.cameras.main.ignore([
+            this.textoBits, 
+            this.processador.barraVida, 
+            this.processador.textoHUD
+        ]);
+
+        // 4. CONFIGURAÇÃO DA CÂMERA HUD
+        this.hudCamera = this.cameras.add(50, 50, 250, 75).setName('HUD');
+        this.hudCamera.setBackgroundColor('#000b00');
+        
+        // A Câmera HUD deve IGNORAR tudo o que é do jogo
+        this.hudCamera.ignore([this.enzinho, this.processador, this.inimigos]);
+
+
+        this.hotbarCamera = this.cameras.add(450, 825, 1000, 100).setName('HUD');
+        this.hotbarCamera.setBackgroundColor('#014901');
+        this.hotbarCamera.ignore([this.enzinho, this.processador, this.inimigos]);
+        this.hotbarCamera.ignore([
+            this.textoBits, 
+            this.processador.barraVida, 
+            this.processador.textoHUD
+        ]);
 
         //Gerenciamento de Ondas
         //this.gerenciadorOndas = new WaveManager(this, WAVES);
