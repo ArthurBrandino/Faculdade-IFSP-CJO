@@ -7,6 +7,8 @@ import { Trojan } from "../entities/Trojan.js";
 import { ILY } from "../entities/ILY.js";
 import { WaveManager } from '../logic/WaveManager.js';
 import { WAVES } from '../logic/WaveData.js';
+import { BuildManager } from '../logic/BuildManager.js';
+import { InputManager } from '../logic/InputManager.js';
 import { Clicker } from '../entities/Clicker.js';
 import { Lixeira } from '../entities/Lixeira.js';
 import { Firewall } from '../entities/Firewall.js';
@@ -22,14 +24,26 @@ export class Game extends Scene {
         this.processador = new Processador(this, 1000, 1000);
         this.physics.add.collider(this.enzinho, this.processador);
         this.inimigos = this.physics.add.group({runChildUpdate: true });
+        this.inputManager = new InputManager(this);
+        
+        //Preview
+        this.previewRange = this.add.graphics();
+        this.previewRange.setDepth(99).setVisible(false);
+
+        this.previewPreco = this.add.text(0, 0, '', {
+            fontSize: '16px',
+            fill: '#ffffff',
+            stroke: '#000000',
+            strokeThickness: 3,
+            fontWeight: 'bold'
+        });
+        this.previewPreco.setOrigin(0.5, 2.5).setDepth(101).setVisible(false);
+          this.buildManager = new BuildManager(this);
 
         // 2. ELEMENTOS DE INTERFACE (HUD)
         this.bits = 0;
         this.textoBits = this.add.text(850, 16, 'Bits: 0', { fontSize: '32px', fill: '#fff' });
         this.textoBits.setScrollFactor(0);
-        
-        // Supondo que sua barra de vida seja um objeto (imagem ou container)
-        // this.barraVida = ... 
 
         // 3. CONFIGURAÇÃO DA CÂMERA PRINCIPAL (JOGO)
         this.cameras.main.startFollow(this.enzinho, true);
@@ -44,18 +58,29 @@ export class Game extends Scene {
         // 4. CONFIGURAÇÃO DA CÂMERA HUD
         this.hudCamera = this.cameras.add(50, 50, 250, 75).setName('HUD');
         this.hudCamera.setBackgroundColor('#000b00');
-        
-        // A Câmera HUD deve IGNORAR tudo o que é do jogo
-        this.hudCamera.ignore([this.enzinho, this.processador, this.inimigos]);
+        this.hudCamera.ignore([
+            this.enzinho, 
+            this.processador, 
+            this.inimigos,
+            this.buildManager.preview,
+            this.previewRange,
+            this.previewPreco
+        ]);
 
 
         this.hotbarCamera = this.cameras.add(450, 825, 1000, 100).setName('HUD');
         this.hotbarCamera.setBackgroundColor('#014901');
         this.hotbarCamera.ignore([this.enzinho, this.processador, this.inimigos]);
         this.hotbarCamera.ignore([
+            this.enzinho, 
+            this.processador, 
+            this.inimigos,
             this.textoBits, 
             this.processador.barraVida, 
-            this.processador.textoHUD
+            this.processador.textoHUD,
+            this.buildManager.preview,
+            this.previewRange,
+            this.previewPreco
         ]);
 
         //Gerenciamento de Ondas
@@ -99,43 +124,6 @@ export class Game extends Scene {
 
         this.selecionada = 1;
 
-        //Preview
-        this.previewConstrucao = this.add.rectangle(0, 0, 100, 100, 0xffffff, 0.5);
-        this.previewConstrucao.setOrigin(0.5).setDepth(100).setVisible(false);
-        this.previewRange = this.add.graphics();
-        this.previewRange.setDepth(99).setVisible(false);
-        this.previewPreco = this.add.text(0, 0, '', {
-            fontSize: '16px',
-            fill: '#ffffff',
-            stroke: '#000000',
-            strokeThickness: 3,
-            fontWeight: 'bold'
-        });
-        this.previewPreco.setOrigin(0.5, 2.5).setDepth(101).setVisible(false);
-
-
-
-        // 3. Atualizar seleção (Teclado)
-        this.input.keyboard.on('keydown-ONE', () => { this.selecionada = 1; this.atualizarPreview(); });
-        this.input.keyboard.on('keydown-TWO', () => { this.selecionada = 2; this.atualizarPreview(); });
-        this.input.keyboard.on('keydown-THREE', () => { this.selecionada = 3; this.atualizarPreview(); });
-        this.input.keyboard.on('keydown-FOUR', () => { this.selecionada = 4; this.atualizarPreview(); });
-
-        // Clique 
-        this.input.on('pointerdown', (pointer) => {
-            // Converte a posição do clique na tela para a posição no mapa (mundo)
-            const dadosAtuais = this.dadosDefesas[this.selecionada];
-            const worldPoint = pointer.positionToCamera(this.cameras.main);
-
-            if (dadosAtuais.modo === 'construcao') {
-                // Se estiver em modo construção, chama a lógica que já temos
-                this.tentarConstruir(worldPoint.x, worldPoint.y);
-            } else {
-                // MODO COMBATE 
-                this.executarAcaoCombate(worldPoint);
-            }
-        });
-
         const tratarColisao = (obj1, obj2) => {
             let inimigo, alvo;
 
@@ -178,20 +166,6 @@ export class Game extends Scene {
             null, 
             this
         );
-
-
-        //testes
-        const debugSpawn = (classeInimigo) => {
-        const worldPoint = this.input.activePointer.positionToCamera(this.cameras.main);
-        const inimigo = new classeInimigo(this, worldPoint.x, worldPoint.y);
-            this.inimigos.add(inimigo);
-        };
-
-        this.input.keyboard.on('keydown-Q', () => debugSpawn(Worm));
-        this.input.keyboard.on('keydown-E', () => debugSpawn(Trojan));
-        this.input.keyboard.on('keydown-R', () => debugSpawn(ILY));
-        this.input.keyboard.on('keydown-P', () => debugSpawn(Pastas));
-        this.input.keyboard.on('keydown-T', () => this.adicionarBits(100));
     }
 
     executarAcaoCombate(worldPoint) {
@@ -234,26 +208,6 @@ export class Game extends Scene {
         }
     }
 
-    tentarConstruir(x, y) {
-        const dados = this.dadosDefesas[this.selecionada];
-        if (!this.dadosDefesas || !this.dadosDefesas[this.selecionada]) return;
-
-        const validacao = this.validarConstrucao(x, y);
-
-        if (validacao.podeConstruir && validacao.temGrana) {
-            const novaDefesa = new dados.classe(this, validacao.x, validacao.y);
-
-            if (novaDefesa) {
-                this.bits -= validacao.custo;
-                this.textoBits.setText('Bits: ' + this.bits);
-                this.defesas.add(novaDefesa);
-            }
-        } else {
-            if (!validacao.temGrana) console.log("Bits insuficientes!");
-            else console.log("Espaço ocupado!");
-        }
-    }
-
     adicionarBits(valor) {
         this.bits += valor;
         this.textoBits.setText('Bits: ' + this.bits);
@@ -290,116 +244,7 @@ export class Game extends Scene {
             this.enzinho.update();
         }
 
-        const dadosAtuais = this.dadosDefesas[this.selecionada];
-
+        this.buildManager.atualizarPreview(this.input.activePointer, this.dadosDefesas[this.selecionada]);
         
-        if (!dadosAtuais || dadosAtuais.modo === 'acao') {
-            if (this.previewConstrucao) this.previewConstrucao.setVisible(false);
-            if (this.previewRange) this.previewRange.setVisible(false);
-            if (this.previewPreco) this.previewPreco.setVisible(false);
-            return; 
-        }
-
-        try {
-            const pointer = this.input.activePointer;
-            const worldPoint = pointer.positionToCamera(this.cameras.main);
-            const validacao = this.validarConstrucao(worldPoint.x, worldPoint.y);
-
-            // 1. Visibilidade e Posição
-            this.previewConstrucao.setVisible(true);
-            this.previewPreco.setVisible(true);
-            
-            this.previewConstrucao.setPosition(validacao.x, validacao.y);
-            this.previewPreco.setPosition(validacao.x, validacao.y);
-            this.previewPreco.setText(`${dadosAtuais.custo} bits`);
-
-            // 2. Lógica de Cores Única (Evita conflitos)
-            const podeColocar = validacao.podeConstruir && validacao.temGrana;
-            const corFeedback = podeColocar ? 0x00ff00 : 0xff0000; // Verde ou Vermelho
-            
-            // O retângulo usa a cor da torre se estiver OK, senão vermelho
-            const corPreenchimento = podeColocar ? (dadosAtuais.cor || 0xffffff) : 0xff0000;
-            this.previewConstrucao.setFillStyle(corPreenchimento, 0.5);
-
-            // 3. Desenho do Range
-            if(dadosAtuais.nome != 'Firewall')
-            {
-                this.previewRange.setVisible(true);
-                this.previewRange.clear();
-                this.previewRange.lineStyle(2, corFeedback, 0.5);
-                this.previewRange.fillStyle(corFeedback, 0.1);
-                const raio = dadosAtuais.range || 150; 
-                this.previewRange.strokeCircle(validacao.x, validacao.y, raio);
-                this.previewRange.fillCircle(validacao.x, validacao.y, raio);
-            }
-            else    
-                this.previewRange.setVisible(false);
-
-        } catch (e) {
-            console.error("Erro no preview de construção:", e);
-        }
-        
-    }
-
-    validarConstrucao(x, y) {
-        const dados = this.dadosDefesas[this.selecionada];
-        if (!dados) return { podeConstruir: false };
-
-        // Calcula o Snap (Centro do bloco de 50x50)
-        const gridX = Math.floor(x / 50) * 50;
-        const gridY = Math.floor(y / 50) * 50;
-
-        const snapX = gridX + (dados.largura / 2);
-        const snapY = gridY + (dados.altura / 2);
-
-        const temGrana = this.bits >= dados.custo;
-
-        // Retângulo virtual da nova construção que você quer colocar
-        const novaArea = new Phaser.Geom.Rectangle(
-            snapX - dados.largura / 2 + 1, 
-            snapY - dados.altura / 2 + 1, 
-            dados.largura - 2, 
-            dados.altura - 2
-        );
-
-        // Verificamos se essa área encosta em defesas já existentes
-        const ocupado = this.defesas.getChildren().some(defesa => {
-            const areaLogicaExistente = new Phaser.Geom.Rectangle(
-                defesa.x - defesa.width / 2 + 1,
-                defesa.y - defesa.height / 2 + 1,
-                defesa.width - 2,
-                defesa.height - 2
-            );
-
-            return Phaser.Geom.Intersects.RectangleToRectangle(novaArea, areaLogicaExistente);
-        });
-
-        const sobreProcessador = Phaser.Geom.Intersects.RectangleToRectangle(novaArea, this.processador.getBounds());
-
-        return {
-            podeConstruir: !ocupado && !sobreProcessador,
-            temGrana: temGrana,
-            x: snapX,
-            y: snapY,
-            custo: dados.custo
-        };
-    }
-
-    atualizarPreview() {
-        const dados = this.dadosDefesas[this.selecionada];
-        
-        // Se for modo combate (ou dados não existirem), esconde o preview e sai da função
-        if (!dados || dados.modo === 'acao') {
-            this.previewConstrucao.setVisible(false);
-            this.previewRange.setVisible(false);
-            this.previewPreco.setVisible(false);
-            return;
-        }
-
-        // Só define tamanho se as propriedades existirem
-        if (dados.largura && dados.altura) {
-            this.previewConstrucao.setSize(dados.largura, dados.altura);
-            this.previewConstrucao.setFillStyle(dados.cor || 0xffffff, 0.5);
-        }
     }
 }
