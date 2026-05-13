@@ -40,7 +40,9 @@ export class InputManager {
             if (dadosAtuais.modo === 'construcao') {
                 this.scene.buildManager.tentarConstruir(worldPoint.x, worldPoint.y);
             } else {
-                this.scene.executarAcaoCombate(worldPoint);
+                if (this.scene.combatManager) {
+                    this.scene.combatManager.executarAcao(worldPoint); 
+                }
             }
         });
     }

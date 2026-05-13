@@ -1,22 +1,11 @@
 import { Pastas } from '../entities/Pastas.js';
-
 export class WaveManager {
     constructor(scene, configOndas) {
         this.scene = scene;
         this.configOndas = configOndas;
         this.indiceAtual = 0;
         this.emDangerZone = false;
-
-        const larguraTela = this.scene.cameras.main.width;
-        const alturaTela = this.scene.cameras.main.height;
-
-        this.textoTimer = this.scene.add.text(larguraTela - 150, alturaTela - 20, '', {
-            fontSize: '48px',
-            fill: '#ffffff',
-            fontFamily: 'monospace',
-            stroke: '#000',
-            strokeThickness: 6
-        }).setOrigin(0.5).setScrollFactor(0);
+        this.eventoTimer = null;
     }
 
     iniciarSistema() {
@@ -24,19 +13,31 @@ export class WaveManager {
     }
 
     proximaOnda() {
+        if (!this.configOndas || this.configOndas.length === 0) return;
+
+        if (this.indiceAtual >= this.configOndas.length) {
+            console.log("SISTEMA LIMPO!");
+            this.scene.events.emit('update-timer', "WIN");
+            return;
+        }
+
         const dadosOnda = this.configOndas[this.indiceAtual];
         
-        if (!dadosOnda) return;
+        // Atualiza o número da Wave na UI
+        this.scene.events.emit('update-wave', dadosOnda.id);
 
         // --- SAFE ZONE ---
         this.emDangerZone = false;
         this.scene.cameras.main.flash(500, 0, 100, 255);
         this.scene.cameras.main.setBackgroundColor(0x001133); 
+        
+        // Envia para o relógio da Hotbar
         this.iniciarContagemRegressiva(dadosOnda.safeTime / 1000, "SAFE");
 
         if (dadosOnda.pastasParaCriar) {
             Pastas.gerarGrupo(this.scene, dadosOnda.pastasParaCriar);
         }
+
         this.scene.time.delayedCall(dadosOnda.safeTime, () => {
             this.iniciarDangerZone(dadosOnda);
         });
@@ -44,23 +45,22 @@ export class WaveManager {
 
     iniciarDangerZone(dadosOnda) {
         this.emDangerZone = true;
-
         this.scene.cameras.main.flash(500, 255, 0, 0);
         this.scene.cameras.main.setBackgroundColor(0x330000);
+        
         this.iniciarContagemRegressiva(dadosOnda.dangerTime / 1000, "DANGER");
 
-        // Para cada tipo de inimigo definido na sub-rotina daquela wave
         dadosOnda.inimigos.forEach(config => {
             this.scene.time.addEvent({
                 delay: config.intervalo,
                 repeat: config.quantidade - 1,
                 callback: () => {
                     this.scene.spawnInimigo(config.classe);
+                    
                 }
             });
         });
 
-        // O tempo de perigo acaba, mas a onda só termina quando os inimigos morrerem
         this.scene.time.delayedCall(dadosOnda.dangerTime, () => {
             this.verificarFimDeOnda();
         });
@@ -68,18 +68,17 @@ export class WaveManager {
 
     iniciarContagemRegressiva(segundos, status) {
         let tempoRestante = segundos;
-        
-        // Se já existir um evento de timer, removemos para não encavalar
         if (this.eventoTimer) this.eventoTimer.remove();
 
         this.eventoTimer = this.scene.time.addEvent({
             delay: 1000,
             callback: () => {
                 tempoRestante--;
-                this.textoTimer.setText(`${status}: ${tempoRestante}s`);
+                
+                // CRITICAL: Isso envia o dado para fora do WaveManager
+                this.scene.events.emit('update-timer', `${status}: ${tempoRestante}s`);
                 
                 if (tempoRestante <= 0) {
-                    this.textoTimer.setText("");
                     this.eventoTimer.remove();
                 }
             },
@@ -88,10 +87,12 @@ export class WaveManager {
     }
 
     verificarFimDeOnda() {
-        // Checa a cada segundo se a tela está limpa
+        this.scene.events.emit('update-timer', "CLEANING...");
+        
         const check = this.scene.time.addEvent({
             delay: 1000,
             callback: () => {
+                // Se não houver mais inimigos ativos no grupo da cena
                 if (this.scene.inimigos.countActive() === 0) {
                     check.remove();
                     this.indiceAtual++;
