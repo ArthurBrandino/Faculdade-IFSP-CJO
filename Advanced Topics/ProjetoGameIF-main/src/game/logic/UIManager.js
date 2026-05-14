@@ -21,31 +21,43 @@ export class UIManager {
     }
 
     setupCameras() {
-        // JOGO
+        // 1. Crie a câmera de fundo primeiro
+        this.offBack = 9000;
+        this.scene.backCamera = this.scene.cameras.add(0, 0, this.w, this.h).setName('GlobalBG');
+        this.scene.backCamera.setScroll(this.offBack, this.offBack);
+
+        // 2. JOGO (Câmera Main)
         const gameW = 950;
         const gameH = 550;
         this.scene.cameras.main.setViewport((this.w - gameW) / 2, 100, gameW, gameH);
         this.scene.cameras.main.setBackgroundColor('#000b00');
 
-        // JANELA VIDA - Foca em 5000
-        this.scene.lifeCamera = this.scene.cameras.add(20, 20, 300, 100).setName('LIFE');
-        this.scene.lifeCamera.setBackgroundColor('#005300').setScroll(this.offVida, this.offVida);
+        
+        this.scene.lifeCamera = this.scene.cameras.add(20, 20, 300, 100).setName('LIFE')
+        .setBackgroundColor('#005300').setScroll(this.offVida, this.offVida);
 
-        // JANELA BITS - Foca em 6000
-        this.scene.bitsCamera = this.scene.cameras.add(this.w - 350, 20, 300, 100).setName('STATUS');
-        this.scene.bitsCamera.setBackgroundColor('#0a0097').setScroll(this.offBits, this.offBits);
+        this.scene.bitsCamera = this.scene.cameras.add(this.w - 350, 20, 300, 100).setName('STATUS')
+        .setBackgroundColor('#0a0097').setScroll(this.offBits, this.offBits);
 
-        // JANELA TURNO - Foca em 7000
-        this.scene.waveCamera = this.scene.cameras.add(this.w - 320, 100, 300, 100).setName('WAVE');
-        this.scene.waveCamera.setBackgroundColor('#4a4a00').setScroll(this.offWave, this.offWave);
+        this.scene.waveCamera = this.scene.cameras.add(this.w - 320, 100, 300, 100).setName('WAVE')
+        .setBackgroundColor('#4a4a00').setScroll(this.offWave, this.offWave);
 
-        // BARRA DE TAREFAS - Foca em 8000
         const barH = 80; 
-        this.scene.hotbarCamera = this.scene.cameras.add(0, this.h - barH, this.w, barH).setName('Hotbar');
-        this.scene.hotbarCamera.setBackgroundColor('#0058aa').setScroll(this.offHotbar, this.offHotbar);
+        this.scene.hotbarCamera = this.scene.cameras.add(0, this.h - barH, this.w, barH).setName('Hotbar')
+        .setBackgroundColor('#0058aa').setScroll(this.offHotbar, this.offHotbar);
+        
+        const cameraIndex = this.scene.cameras.cameras.indexOf(this.scene.backCamera);
+        if (cameraIndex > -1) {
+            const [cam] = this.scene.cameras.cameras.splice(cameraIndex, 1);
+            this.scene.cameras.cameras.unshift(cam);
+        }
     }
 
     setupUIElements() {
+        this.globalBG = this.scene.add.image(this.offBack + (this.w/2), this.offBack + (this.h/2), 'meu-wallpaper')
+        .setDisplaySize(this.w, this.h)
+        .setDepth(-1); 
+
         const estiloTexto = { fontSize: '30px', fill: '#00ff00', fontFamily: 'Courier', fontWeight: 'bold' };
 
         // VIDA (Ilha 5000)
@@ -154,13 +166,23 @@ export class UIManager {
     }
 
     applyCameraIgnores() {
-        // Agora só precisamos dizer para a câmera do jogo ignorar as ilhas de UI
         const tudoUI = [
             this.scene.textoBits, this.scene.textoTurno, 
             this.barraVida, this.textoHUD, ...(this.iconesRef || [])
         ].filter(el => el != null);
 
-        this.scene.cameras.main.ignore(tudoUI);
+        // 1. A câmera principal deve ignorar a UI E a imagem de background
+        this.scene.cameras.main.ignore([...tudoUI, this.globalBG]);
+
+        // 2. A câmera de background ignora a UI (você já fez isso)
+        this.scene.backCamera.ignore(tudoUI);
+
+        // 3. Opcional: Se as HUDs estiverem "cortando" o fundo, 
+        // faça elas ignorarem o background também
+        this.scene.lifeCamera.ignore(this.globalBG);
+        this.scene.bitsCamera.ignore(this.globalBG);
+        this.scene.waveCamera.ignore(this.globalBG);
+        this.scene.hotbarCamera.ignore(this.globalBG);
     }
 
     setupListeners() {
