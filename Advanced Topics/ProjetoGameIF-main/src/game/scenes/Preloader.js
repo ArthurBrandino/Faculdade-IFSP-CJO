@@ -32,15 +32,18 @@ export class Preloader extends Scene
         //  Load the assets for the game - Replace with your own assets
         this.load.setPath('assets');
 
+        this.load.image('logo_winxp', 'mapa/Logo_winxp.png');
+        this.load.image('on_button', 'mapa/ON_Sprite.png');
         this.load.image('meu-wallpaper', 'mapa/background.jpg');
-        this.load.image('logo', 'logo.png'); // Busca em assets/logo.png
-        this.load.image('spr_clicker', 'defesas/Clicker_Sprite.png'); // Busca em assets/defesas/...
+        this.load.image('logo', 'logo.png'); 
+        this.load.image('spr_clicker', 'defesas/Clicker_Sprite.png');
         this.load.image('spr_firewall', 'defesas/Firewall_Sprite.png');
         this.load.spritesheet('spr_worm', 'inimigos/Worm_Sprite.png', { 
             frameWidth: 16, 
             frameHeight: 16 
         });
         this.load.image('spr_letter', 'inimigos/Letter_Sprite.png');
+        this.load.image('spr_trojan', 'inimigos/Trojan_Sprite.png');
         this.load.spritesheet('spr_folder', 'mapa/Folder_Sprite.png', { 
             frameWidth: 32, 
             frameHeight: 32 

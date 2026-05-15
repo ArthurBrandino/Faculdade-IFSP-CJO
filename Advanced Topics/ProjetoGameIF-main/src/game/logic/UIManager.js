@@ -51,33 +51,71 @@ export class UIManager {
             const [cam] = this.scene.cameras.cameras.splice(cameraIndex, 1);
             this.scene.cameras.cameras.unshift(cam);
         }
-    }
 
+        // Flash de Dano
+        const { width, height } = this.scene.scale;
+        this.scene.flashOverlay = this.scene.add.rectangle(width / 2, height / 2, width, height, 0xff0000);
+        this.scene.flashOverlay.setScrollFactor(0); 
+        this.scene.flashOverlay.setDepth(99999);   
+        this.scene.flashOverlay.setAlpha(0);
+    }
+    
     setupUIElements() {
         this.globalBG = this.scene.add.image(this.offBack + (this.w/2), this.offBack + (this.h/2), 'meu-wallpaper')
-        .setDisplaySize(this.w, this.h)
-        .setDepth(-1); 
+            .setDisplaySize(this.w, this.h).setDepth(-1);
 
-        const estiloTexto = { fontSize: '30px', fill: '#00ff00', fontFamily: 'Courier', fontWeight: 'bold' };
+        const estiloValor = { fontSize: '28px', fill: '#000', fontFamily: 'Courier', fontWeight: 'bold' };
 
-        // VIDA (Ilha 5000)
+        // --- HUD VIDA (Ilha 5000) ---
+        this.criarMolduraWinXP(this.offVida, this.offVida, 300, 100, "SYSTEM_MONITOR.EXE");
         this.barraVida = this.scene.add.graphics();
-        this.textoHUD = this.scene.add.text(this.offVida + 20, this.offVida + 65, 'CPU_STABILITY: OK', {
-            fontSize: '14px', fill: '#00ff00', fontFamily: 'monospace'
-        }).setDepth(2000);
+        this.textoHUD = this.scene.add.text(this.offVida + 15, this.offVida + 75, 'STATUS: OK', {
+            fontSize: '12px', fill: '#000', fontFamily: 'monospace'
+        });
 
-        this.scene.events.on('update-hp', (atual, max) => this.desenharBarraVida(atual, max));
+        // --- HUD BITS (Ilha 6000) ---
+        this.criarMolduraWinXP(this.offBits, this.offBits, 300, 100, "BIT_COUNTER.SYS");
+        this.scene.textoBits = this.scene.add.text(this.offBits + 150, this.offBits + 60, 'BITS: 0', estiloValor).setOrigin(0.5);
 
-        // BITS (Ilha 6000)
-        this.scene.textoBits = this.scene.add.text(this.offBits + 150, this.offBits + 50, 'BITS: 0', estiloTexto)
-            .setOrigin(0.5).setDepth(2000);
+        // --- HUD WAVE (Ilha 7000) ---
+        this.criarMolduraWinXP(this.offWave, this.offWave, 300, 100, "WAVE_MANAGER.DLL");
+        this.scene.textoTurno = this.scene.add.text(this.offWave + 150, this.offWave + 60, 'WAVE: 01', estiloValor).setOrigin(0.5);
 
-        // TURNO (Ilha 7000)
-        this.scene.textoTurno = this.scene.add.text(this.offWave + 150, this.offWave + 50, 'WAVE: 01', estiloTexto)
-            .setOrigin(0.5).setDepth(2000);
+        // --- GERENCIAMENTO DE EVENTOS ---
+        
+       this.onUpdateHP = (atual, max) => {
+            if (!this.barraVida || !this.barraVida.scene) return; // Proteção total
+            this.desenharBarraVida(atual, max);
+        };
+
+        this.onUpdateBits = (valor) => {
+            if (!this.scene.textoBits || !this.scene.textoBits.scene) return; // Proteção total
+            this.scene.textoBits.setText('BITS: ' + valor);
+        };
+
+        // 2. Registre os eventos no Scene Events
+        // IMPORTANTE: Use o scene.events da cena do JOGO, não o do Manager global se houver
+        this.scene.events.on('update-hp', this.onUpdateHP);
+        this.scene.events.on('update-bits', this.onUpdateBits);
+
+        // 3. A LIMPEZA DEFINITIVA (O evento 'shutdown' é nativo e infalível)
+        this.scene.events.once('shutdown', () => {
+            this.scene.events.off('update-hp', this.onUpdateHP);
+            this.scene.events.off('update-bits', this.onUpdateBits);
             
-        this.desenharBarraVida(100, 100);
-        this.applyCameraIgnores();
+            // Mate os textos manualmente para não sobrarem referências
+            this.barraVida = null;
+            if(this.scene.textoBits) this.scene.textoBits = null;
+            if(this.scene.textoTurno) this.scene.textoTurno = null;
+            
+            console.log("UI Manager: Listeners removidos com sucesso.");
+        });
+    }
+
+    atualizarTextoWave(numero) {
+        
+        const waveFormatada = String(numero).padStart(2, '0');
+        this.scene.textoTurno.setText(`WAVE: ${waveFormatada}`);
     }
 
     desenharBarraVida(atual, max) {
@@ -117,13 +155,13 @@ export class UIManager {
             fontSize: '14px', fill: '#00ff00', fontWeight: 'bold', fontFamily: 'monospace'
         }).setOrigin(0.5).setDepth(2001);
 
-        // RELÓGIO (Sem o botão menu em cima)
+        // RELÓGIO 
         this.txtTempoWave = this.scene.add.text(off + camera.width - 80, worldY, '00:00', {
             fontSize: '16px', fill: '#00ff00', fontFamily: 'monospace', fontWeight: 'bold'
         }).setOrigin(0.5).setDepth(2001);
 
         const larguraSlot = 55;
-        const espacamento = 15;
+        const espacamento = 45;
         const totalSlots = 4;
         const larguraGrupo = (totalSlots * larguraSlot) + ((totalSlots - 1) * espacamento);
         const inicioX = (camera.width / 2) - (larguraGrupo / 2) + (larguraSlot / 2);
@@ -187,9 +225,18 @@ export class UIManager {
 
     setupListeners() {
         this.scene.events.on('update-timer', (texto) => {
-            if (this.txtTempoWave) {
+            // VERIFICAÇÃO BLINDADA: 
+            // O texto existe E a cena dele ainda está ativa?
+            if (this.txtTempoWave && this.txtTempoWave.scene && this.txtTempoWave.scene.sys.isActive()) {
                 this.txtTempoWave.setText(texto);
                 this.txtTempoWave.setFill(texto.includes("DANGER") ? '#ff0000' : '#00ff00');
+            }
+        });
+
+        // Mesma lógica aqui para evitar erros em outras partes da UI
+        this.scene.events.on('proxima-wave', (numeroDaWave) => {
+            if (this.scene && this.scene.sys.isActive()) {
+                this.atualizarTextoWave(numeroDaWave);
             }
         });
     }
@@ -203,5 +250,25 @@ export class UIManager {
 
     atualizarBits(valor) {
         if (this.scene.textoBits) this.scene.textoBits.setText('BITS: ' + valor);
+    }
+
+    criarMolduraWinXP(x, y, largura, altura, tituloTexto) {
+        // 1. Fundo Cinza
+        const fundo = this.scene.add.rectangle(x, y, largura, altura, 0xced4d6).setOrigin(0, 0);
+        
+        // 2. Barra de Título Azul
+        const barra = this.scene.add.rectangle(x, y, largura, 25, 0x000080).setOrigin(0, 0);
+        
+        // 3. Texto do Título
+        this.scene.add.text(x + 5, y + 5, tituloTexto, { 
+            fontSize: '12px', fill: '#fff', fontWeight: 'bold', fontFamily: 'Tahoma' 
+        });
+
+        // 4. Borda Preta
+        const borda = this.scene.add.graphics();
+        borda.lineStyle(2, 0x000000);
+        borda.strokeRect(x, y, largura, altura);
+
+        return { fundo, barra };
     }
 }

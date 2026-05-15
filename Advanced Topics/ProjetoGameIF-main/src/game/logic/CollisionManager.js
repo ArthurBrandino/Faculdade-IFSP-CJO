@@ -7,15 +7,24 @@ export class CollisionManager {
     }
 
     setupCollisions() {
-        // Colisão com as Defesas e com o Processador
-        this.scene.physics.add.overlap(
-            this.scene.inimigos, 
-            [this.scene.defesas, this.scene.processador], 
-            this.tratarColisao, 
-            null, 
-            this
-        );
-    }
+    // Colisão Inimigos vs Processador
+    this.scene.physics.add.overlap(
+        this.scene.inimigos, 
+        this.scene.processador, 
+        this.tratarColisao, 
+        null, 
+        this
+    );
+
+    // Colisão Inimigos vs Defesas (Torres)
+    this.scene.physics.add.overlap(
+        this.scene.inimigos, 
+        this.scene.defesas, 
+        this.tratarColisao, 
+        null, 
+        this
+    );
+}
 
     tratarColisao(obj1, obj2) {
         let inimigo, alvo;

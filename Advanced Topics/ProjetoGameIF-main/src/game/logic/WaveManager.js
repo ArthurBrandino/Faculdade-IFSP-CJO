@@ -6,13 +6,24 @@ export class WaveManager {
         this.indiceAtual = 0;
         this.emDangerZone = false;
         this.eventoTimer = null;
+
+        this.scene.events.once('GameOver', () => {
+            // Procura por qualquer timer que você tenha criado
+            if (this.timerGeradorDeWave) {
+                this.timerGeradorDeWave.remove();
+            }
+            // Se você usa o clock do phaser diretamente:
+            this.scene.time.removeAllEvents(); 
+        });
     }
 
     iniciarSistema() {
         this.proximaOnda();
+        this.currentWave = 0;
     }
 
     proximaOnda() {
+
         if (!this.configOndas || this.configOndas.length === 0) return;
 
         if (this.indiceAtual >= this.configOndas.length) {
@@ -44,6 +55,9 @@ export class WaveManager {
     }
 
     iniciarDangerZone(dadosOnda) {
+         // Dentro da lógica de mudar de wave no WaveManager.js
+        this.currentWave++; 
+        this.scene.events.emit('proxima-wave', this.currentWave);
         this.emDangerZone = true;
         this.scene.cameras.main.flash(500, 255, 0, 0);
         this.scene.cameras.main.setBackgroundColor(0x330000);
@@ -68,18 +82,23 @@ export class WaveManager {
 
     iniciarContagemRegressiva(segundos, status) {
         let tempoRestante = segundos;
-        if (this.eventoTimer) this.eventoTimer.remove();
+        if (this.eventoTimer) this.eventoTimer.destroy(); // Use destroy em vez de remove para ser mais agressivo
 
         this.eventoTimer = this.scene.time.addEvent({
             delay: 1000,
             callback: () => {
+                // SE A CENA MORREU, PARA O TIMER IMEDIATAMENTE
+                if (!this.scene || !this.scene.sys.isActive()) {
+                    if (this.eventoTimer) this.eventoTimer.destroy();
+                    return;
+                }
+
                 tempoRestante--;
                 
-                // CRITICAL: Isso envia o dado para fora do WaveManager
                 this.scene.events.emit('update-timer', `${status}: ${tempoRestante}s`);
                 
                 if (tempoRestante <= 0) {
-                    this.eventoTimer.remove();
+                    this.eventoTimer.destroy();
                 }
             },
             loop: true

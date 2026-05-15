@@ -1,24 +1,33 @@
 import { Inimigo } from "./Virus";
 import { Worm } from "./Worm";
 
-const COR_TROJAN = 0x8C5C51;
-
 export class Trojan extends Inimigo {
     constructor(scene, x, y){
         const velocidade = 30;
         const vida = 40;
         const dano = 10;
-        const largura = 32; 
-        const altura = 32;
+        const largura = 50; 
+        const altura = 50;
         const frequencia = 0;
         const amplitude = 0;
 
-        super(scene, x, y, largura, altura, vida, velocidade, dano, frequencia, amplitude);
-        this.setFillStyle(COR_TROJAN);
+        super(scene, x, y, largura, altura, 'spr_trojan', vida, velocidade, dano, frequencia, amplitude);
+        
     }
 
-    preUpdate(time, delta){
+    preUpdate(time, delta) {
         super.preUpdate(time, delta);
+
+        // Verifica a velocidade no corpo físico
+        if (this.body) {
+            if (this.body.velocity.x > 0) {
+                // Se a velocidade X é positiva, ele vai para a direita
+                this.setFlipX(false); 
+            } else if (this.body.velocity.x < 0) {
+                // Se a velocidade X é negativa, ele vai para a esquerda (Inverte o sprite)
+                this.setFlipX(true); 
+            }
+        }
     }
 
     morrer(gerarFilhos = true) {
@@ -26,10 +35,20 @@ export class Trojan extends Inimigo {
         {
             let quantidade = Phaser.Math.Between(2, 4);
             for (let i = 0; i < quantidade; i++) {
-                const wormFilho = new Worm(this.scene, this.x, this.y);
+                
+                const offsetX = Phaser.Math.Between(-30, 30);
+                const offsetY = Phaser.Math.Between(-30, 30);
+
+                const wormFilho = new Worm(
+                    this.scene, 
+                    this.x + offsetX, 
+                    this.y + offsetY
+                );
             
                 if (this.scene.inimigos) {
                     this.scene.inimigos.add(wormFilho);
+
+                    
                 }
             }
         }
