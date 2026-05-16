@@ -32,6 +32,7 @@ export class Preloader extends Scene
         //  Load the assets for the game - Replace with your own assets
         this.load.setPath('assets');
 
+        this.load.image('menu', 'mapa/Menu.png');
         this.load.image('logo_winxp', 'mapa/Logo_winxp.png');
         this.load.image('on_button', 'mapa/ON_Sprite.png');
         this.load.image('meu-wallpaper', 'mapa/background.jpg');

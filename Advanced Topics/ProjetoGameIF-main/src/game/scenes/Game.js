@@ -47,7 +47,6 @@ export class Game extends Scene {
         }).setOrigin(0.5, 2.5).setDepth(101).setVisible(false);
 
         // 6. INICIALIZAÇÃO DOS GERENCIADORES
-        // Nota: A ordem importa. Build e UI primeiro, Input por último.
         this.combatManager = new CombatManager(this);
         this.buildManager = new BuildManager(this);
         this.uiManager = new UIManager(this); 

@@ -61,8 +61,25 @@ export class UIManager {
     }
     
     setupUIElements() {
+        // 1. Cria o Wallpaper na ilha 9000 (Onde a backCamera está olhando estática)
         this.globalBG = this.scene.add.image(this.offBack + (this.w/2), this.offBack + (this.h/2), 'meu-wallpaper')
             .setDisplaySize(this.w, this.h).setDepth(-1);
+
+        // --- MOLDURA DA JANELA PRINCIPAL DO JOGO (NA ILHA DE FUNDO - IGUAL OS HUDS) ---
+        const gameW = 950;
+        const gameH = 550;
+        
+        // Pegamos a EXATA posição da tela onde o Viewport da main foi desenhado:
+        // X = (this.w - gameW) / 2  e  Y = 100
+        // E somamos o 'this.offBack' para jogar esse desenho lá para a ilha 9000 da backCamera!
+        const molduraX = this.offBack + ((this.w - gameW) / 2);
+        const molduraY = this.offBack + 100; 
+
+        // Criamos a moldura na ilha de fundo.
+        // Como a backCamera está estática em (9000, 9000), a barra azul e as bordas vão ficar 
+        // perfeitamente travadas na tela, contornando o jogo por fora!
+        this.janelaJogoContainer = this.criarMolduraWinXP(molduraX, molduraY, gameW, gameH, "C:\\Games\\Cyber_Defense.exe");
+
 
         const estiloValor = { fontSize: '28px', fill: '#000', fontFamily: 'Courier', fontWeight: 'bold' };
 
@@ -82,33 +99,25 @@ export class UIManager {
         this.scene.textoTurno = this.scene.add.text(this.offWave + 150, this.offWave + 60, 'WAVE: 01', estiloValor).setOrigin(0.5);
 
         // --- GERENCIAMENTO DE EVENTOS ---
-        
-       this.onUpdateHP = (atual, max) => {
-            if (!this.barraVida || !this.barraVida.scene) return; // Proteção total
+        this.onUpdateHP = (atual, max) => {
+            if (!this.barraVida || !this.barraVida.scene) return; 
             this.desenharBarraVida(atual, max);
         };
 
         this.onUpdateBits = (valor) => {
-            if (!this.scene.textoBits || !this.scene.textoBits.scene) return; // Proteção total
+            if (!this.scene.textoBits || !this.scene.textoBits.scene) return; 
             this.scene.textoBits.setText('BITS: ' + valor);
         };
 
-        // 2. Registre os eventos no Scene Events
-        // IMPORTANTE: Use o scene.events da cena do JOGO, não o do Manager global se houver
         this.scene.events.on('update-hp', this.onUpdateHP);
         this.scene.events.on('update-bits', this.onUpdateBits);
 
-        // 3. A LIMPEZA DEFINITIVA (O evento 'shutdown' é nativo e infalível)
         this.scene.events.once('shutdown', () => {
             this.scene.events.off('update-hp', this.onUpdateHP);
             this.scene.events.off('update-bits', this.onUpdateBits);
-            
-            // Mate os textos manualmente para não sobrarem referências
             this.barraVida = null;
             if(this.scene.textoBits) this.scene.textoBits = null;
             if(this.scene.textoTurno) this.scene.textoTurno = null;
-            
-            console.log("UI Manager: Listeners removidos com sucesso.");
         });
     }
 
@@ -143,64 +152,16 @@ export class UIManager {
     }
 
     criarIconesHotbar() {
+        
         const off = this.offHotbar;
         const camera = this.scene.hotbarCamera;
         const worldY = off + (camera.height / 2);
-        
-        // BOTÃO START
-        this.btnStart = this.scene.add.rectangle(off + 45, worldY, 70, 40, 0x00ff00, 0.2)
-            .setStrokeStyle(2, 0x00ff00).setInteractive({ useHandCursor: true }).setDepth(2000);
 
-        this.txtStart = this.scene.add.text(off + 45, worldY, 'START', {
-            fontSize: '14px', fill: '#00ff00', fontWeight: 'bold', fontFamily: 'monospace'
-        }).setOrigin(0.5).setDepth(2001);
+        this.criarBotaoStart(off, worldY);
 
-        // RELÓGIO 
-        this.txtTempoWave = this.scene.add.text(off + camera.width - 80, worldY, '00:00', {
-            fontSize: '16px', fill: '#00ff00', fontFamily: 'monospace', fontWeight: 'bold'
-        }).setOrigin(0.5).setDepth(2001);
+        this.criarRelogio(off, worldY, camera);
 
-        const larguraSlot = 55;
-        const espacamento = 45;
-        const totalSlots = 4;
-        const larguraGrupo = (totalSlots * larguraSlot) + ((totalSlots - 1) * espacamento);
-        const inicioX = (camera.width / 2) - (larguraGrupo / 2) + (larguraSlot / 2);
-
-        const itensHotbar = [
-            { nome: 'CURSOR', preco: 0 },
-            { nome: 'CLICKER', preco: Clicker.CUSTO },
-            { nome: 'LIXEIRA', preco: Lixeira.CUSTO },
-            { nome: 'FIREWALL', preco: Firewall.CUSTO }
-        ];
-
-        this.slots = [];
-        this.iconesRef = [this.btnStart, this.txtStart, this.txtTempoWave];
-
-        itensHotbar.forEach((item, i) => {
-            const x = off + inicioX + i * (larguraSlot + espacamento);
-
-            const bg = this.scene.add.rectangle(x, worldY, larguraSlot, larguraSlot, 0x000000)
-                .setStrokeStyle(2, 0xffffff).setInteractive({ useHandCursor: true }).setDepth(2000);
-
-            const txtNum = this.scene.add.text(x, worldY - 15, i + 1, { 
-                fontSize: '12px', fill: '#00ff00', fontFamily: 'monospace' 
-            }).setOrigin(0.5).setDepth(2001);
-
-            const txtNome = this.scene.add.text(x, worldY + 5, item.nome, { fontSize: '9px', fill: '#ffffff' })
-                .setOrigin(0.5).setDepth(2001);
-
-            if (item.preco > 0) {
-                const txtPreco = this.scene.add.text(x, worldY + 18, `$${item.preco}`, { fontSize: '9px', fill: '#ffff00' })
-                    .setOrigin(0.5).setDepth(2001);
-                this.iconesRef.push(txtPreco);
-            }
-
-            this.slots[i + 1] = bg;
-            bg.on('pointerdown', () => this.selecionarSlot(i + 1));
-            this.iconesRef.push(bg, txtNum, txtNome);
-        });
-
-        this.selecionarSlot(1);
+        this.criarItens(off, worldY, camera)
     }
 
     applyCameraIgnores() {
@@ -270,5 +231,116 @@ export class UIManager {
         borda.strokeRect(x, y, largura, altura);
 
         return { fundo, barra };
+    }
+
+    criarBotaoStart(off, worldY){
+        
+        // ---  BOTÃO START  ---
+        const startX = off + 85; 
+        const startWidth = 110;  
+        const startHeight = 34;
+
+        // Base Verde 
+        this.btnStart = this.scene.add.rectangle(startX, worldY, startWidth, startHeight, 0x388A34)
+            .setStrokeStyle(1.5, 0x2E6A29) 
+            .setInteractive({ useHandCursor: true })
+            .setDepth(2000);
+
+        //Logo 
+        this.menuLogo = this.scene.add.image(startX - (startWidth / 2) + 18, worldY, 'menu')
+            .setScale(0.25)
+            .setDepth(2001);
+
+        // 3. Texto 
+        this.txtStart = this.scene.add.text(startX + 12, worldY, 'start', {
+            fontSize: '16px', 
+            fill: '#ffffff', 
+            fontWeight: 'bold', 
+            fontStyle: 'italic',
+            fontFamily: 'Tahoma, Arial, sans-serif',
+            shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 1, stroke: false, fill: true }
+        }).setOrigin(0.5).setDepth(2001);
+
+        // --- INTERATIVIDADE DO BOTÃO START ---
+        this.btnStart.on('pointerover', () => this.btnStart.setFillStyle(0x4CA647));  // Brilha ao passar o mouse
+        this.btnStart.on('pointerout', () => this.btnStart.setFillStyle(0x388A34));   // Restaura a cor padrão
+        this.btnStart.on('pointerdown', () => this.btnStart.setFillStyle(0x286325));  // Escurece ao clicar
+    }
+
+    criarRelogio(off, worldY, camera, barH){
+        // ÁREA DO RELÓGIO
+        const trayX = off + camera.width - 75;
+        const trayWidth = 160;
+        const trayHeight = barH;
+
+        this.trayBG = this.scene.add.rectangle(trayX, worldY, trayWidth, trayHeight, 0x16619eff)
+            .setStrokeStyle(1, 0x2595f0ff)
+            .setDepth(2000);
+
+        this.txtTempoWave = this.scene.add.text(trayX, worldY, '00:00', {
+            fontSize: '20px', 
+            fill: '#ffffff', 
+            fontFamily: 'Tahoma, Arial, sans-serif', 
+            fontWeight: 'bold'
+        }).setOrigin(0.5).setDepth(2001);
+    }
+
+    criarItens(off, worldY, camera){
+         // --- CRIAÇÃO DOS SLOTS DE ITENS (MANTIDA A LÓGICA ORIGINAL) ---
+        const larguraSlot = 55;
+        const espacamento = 45;
+        const totalSlots = 4;
+        const larguraGrupo = (totalSlots * larguraSlot) + ((totalSlots - 1) * espacamento);
+        const inicioX = (camera.width / 2) - (larguraGrupo / 2) + (larguraSlot / 2);
+
+        const itensHotbar = [
+            { nome: 'CURSOR', preco: 0 },
+            { nome: 'CLICKER', preco: Clicker.CUSTO },
+            { nome: 'LIXEIRA', preco: Lixeira.CUSTO },
+            { nome: 'FIREWALL', preco: Firewall.CUSTO }
+        ];
+
+        this.slots = [];
+        // Atualizado o array de referências para incluir as novas peças visuais
+        this.iconesRef = [this.btnStart, this.menuLogo, this.txtStart, this.trayBG, this.txtTempoWave];
+
+        itensHotbar.forEach((item, i) => {
+            const x = off + inicioX + i * (larguraSlot + espacamento);
+
+            // Estética cinza clássica de botão do Windows para os slots desmarcados
+            const bg = this.scene.add.rectangle(x, worldY, larguraSlot, larguraSlot, 0xd4d0c8)
+                .setStrokeStyle(1.5, 0xffffff) // Borda clara imitando relevo clássico
+                .setInteractive({ useHandCursor: true })
+                .setDepth(2000);
+
+            const txtNum = this.scene.add.text(x - 18, worldY - 18, i + 1, { 
+                fontSize: '11px', 
+                fill: '#808080', 
+                fontFamily: 'Tahoma, Arial, sans-serif',
+                fontWeight: 'bold'
+            }).setOrigin(0.5).setDepth(2001);
+
+            const txtNome = this.scene.add.text(x, worldY - 2, item.nome, { 
+                fontSize: '10px', 
+                fill: '#000000',
+                fontFamily: 'Tahoma, Arial, sans-serif',
+                fontWeight: 'bold'
+            }).setOrigin(0.5).setDepth(2001);
+
+            if (item.preco > 0) {
+                const txtPreco = this.scene.add.text(x, worldY + 14, `$${item.preco}`, { 
+                    fontSize: '10px', 
+                    fill: '#008000', // Preco em verde clássico de sistema
+                    fontFamily: 'Tahoma, Arial, sans-serif'
+                }).setOrigin(0.5).setDepth(2001);
+                this.iconesRef.push(txtPreco);
+            }
+
+            this.slots[i + 1] = bg;
+            bg.on('pointerdown', () => this.selecionarSlot(i + 1));
+            this.iconesRef.push(bg, txtNum, txtNome);
+        });
+
+        this.selecionarSlot(1);
     }
 }
