@@ -31,7 +31,6 @@ export class WaveManager {
             this.scene.events.emit('update-timer', "WIN");
             return;
         }
-
         const dadosOnda = this.configOndas[this.indiceAtual];
         
         // Atualiza o número da Wave na UI
@@ -55,7 +54,7 @@ export class WaveManager {
     }
 
     iniciarDangerZone(dadosOnda) {
-         // Dentro da lógica de mudar de wave no WaveManager.js
+        this.scene.sound.play('EvilLaugh');
         this.currentWave++; 
         this.scene.events.emit('proxima-wave', this.currentWave);
         this.emDangerZone = true;
@@ -115,6 +114,7 @@ export class WaveManager {
                 if (this.scene.inimigos.countActive() === 0) {
                     check.remove();
                     this.indiceAtual++;
+                    this.scene.sound.play('WaveClear');
                     this.proximaOnda();
                 }
             },

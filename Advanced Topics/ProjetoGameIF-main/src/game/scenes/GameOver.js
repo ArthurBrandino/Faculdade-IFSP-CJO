@@ -9,6 +9,9 @@ export class GameOver extends Scene
 
     create ()
     {
+        this.sound.stopAll();
+        this.sound.play('death_processador');
+        this.sound.play('Shutdown');
         // 1. O Azul Oficial da BSOD do Windows XP (#0000AA)
         this.cameras.main.setBackgroundColor('#0000aa');
 

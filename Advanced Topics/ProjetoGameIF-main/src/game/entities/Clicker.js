@@ -7,8 +7,8 @@ export class Clicker extends Defesa {
     static get RANGE() { return 300; }
     static get LARGURA() { return 100; }
     static get ALTURA() { return 100; }
-    static get VIDA() { return 1; }
-    static get TAXA_TIRO() { return 2000; }
+    static get VIDA() { return 50; }
+    static get TAXA_TIRO() { return 1000; }
     static get DANO() { return 1; }
 
     constructor(scene, x, y) {
@@ -42,7 +42,8 @@ export class Clicker extends Defesa {
             alvo.receberDano(this.dano); 
             this.proximoTiro = time + this.speed;
             
-            // Feedback visual
+            // Feedback visual e sonoro
+            this.scene.sound.play('ClickerShoot');
             this.scene.tweens.add({
                 targets: this,
                 scale: 0.8,

@@ -8,7 +8,7 @@ export class UIManager {
         this.w = this.scene.scale.width;
         this.h = this.scene.scale.height;
 
-        // "Ilhas" de UI para evitar que uma câmera veja a outra
+        // Evitar que uma câmera veja a outra
         this.offVida = 5000;
         this.offBits = 6000;
         this.offWave = 7000;
@@ -65,36 +65,30 @@ export class UIManager {
         this.globalBG = this.scene.add.image(this.offBack + (this.w/2), this.offBack + (this.h/2), 'meu-wallpaper')
             .setDisplaySize(this.w, this.h).setDepth(-1);
 
-        // --- MOLDURA DA JANELA PRINCIPAL DO JOGO (NA ILHA DE FUNDO - IGUAL OS HUDS) ---
+        // --- MOLDURA DA JANELA PRINCIPAL DO JOGO ---
         const gameW = 950;
         const gameH = 550;
         
-        // Pegamos a EXATA posição da tela onde o Viewport da main foi desenhado:
-        // X = (this.w - gameW) / 2  e  Y = 100
-        // E somamos o 'this.offBack' para jogar esse desenho lá para a ilha 9000 da backCamera!
         const molduraX = this.offBack + ((this.w - gameW) / 2);
         const molduraY = this.offBack + 100; 
 
-        // Criamos a moldura na ilha de fundo.
-        // Como a backCamera está estática em (9000, 9000), a barra azul e as bordas vão ficar 
-        // perfeitamente travadas na tela, contornando o jogo por fora!
         this.janelaJogoContainer = this.criarMolduraWinXP(molduraX, molduraY, gameW, gameH, "C:\\Games\\Cyber_Defense.exe");
 
 
         const estiloValor = { fontSize: '28px', fill: '#000', fontFamily: 'Courier', fontWeight: 'bold' };
 
-        // --- HUD VIDA (Ilha 5000) ---
+        // --- HUD VIDA ---
         this.criarMolduraWinXP(this.offVida, this.offVida, 300, 100, "SYSTEM_MONITOR.EXE");
         this.barraVida = this.scene.add.graphics();
         this.textoHUD = this.scene.add.text(this.offVida + 15, this.offVida + 75, 'STATUS: OK', {
             fontSize: '12px', fill: '#000', fontFamily: 'monospace'
         });
 
-        // --- HUD BITS (Ilha 6000) ---
+        // --- HUD BITS ---
         this.criarMolduraWinXP(this.offBits, this.offBits, 300, 100, "BIT_COUNTER.SYS");
         this.scene.textoBits = this.scene.add.text(this.offBits + 150, this.offBits + 60, 'BITS: 0', estiloValor).setOrigin(0.5);
 
-        // --- HUD WAVE (Ilha 7000) ---
+        // --- HUD WAVE ---
         this.criarMolduraWinXP(this.offWave, this.offWave, 300, 100, "WAVE_MANAGER.DLL");
         this.scene.textoTurno = this.scene.add.text(this.offWave + 150, this.offWave + 60, 'WAVE: 01', estiloValor).setOrigin(0.5);
 
@@ -170,14 +164,10 @@ export class UIManager {
             this.barraVida, this.textoHUD, ...(this.iconesRef || [])
         ].filter(el => el != null);
 
-        // 1. A câmera principal deve ignorar a UI E a imagem de background
         this.scene.cameras.main.ignore([...tudoUI, this.globalBG]);
 
-        // 2. A câmera de background ignora a UI (você já fez isso)
         this.scene.backCamera.ignore(tudoUI);
 
-        // 3. Opcional: Se as HUDs estiverem "cortando" o fundo, 
-        // faça elas ignorarem o background também
         this.scene.lifeCamera.ignore(this.globalBG);
         this.scene.bitsCamera.ignore(this.globalBG);
         this.scene.waveCamera.ignore(this.globalBG);

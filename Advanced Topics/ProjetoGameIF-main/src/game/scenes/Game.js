@@ -22,6 +22,10 @@ export class Game extends Scene {
         super('Game'); 
     }
 
+    init(data) {
+        this.somTransicao = data.somTransicao;
+    }
+
     create() {
         // 1. ESTADO INICIAL
         this.bits = 0;
@@ -65,6 +69,33 @@ export class Game extends Scene {
                 this.uiManager.selecionarSlot(num);
             }
         });
+
+        this.input.keyboard.on('keydown', (event) => {
+            const num = parseInt(event.key);
+            if (num >= 1 && num <= 4) {
+                this.uiManager.selecionarSlot(num);
+            }
+        });
+
+        // --- AJUSTE DA TRILHA RETRÔ COORDENADA ---
+        this.bgmOnda = this.sound.add('soundtrack', {
+            loop: true,
+            volume: 0.35 
+        });
+
+        // O JOGO SÓ SOLTA A MÚSICA QUANDO O SOM DE START TERMINAR:
+        if (this.somTransicao && this.somTransicao.isPlaying) {
+            
+            // Quando o barulho de inicialização do Windows XP acabar...
+            this.somTransicao.once('complete', () => {
+                this.bgmOnda.play(); // ...a trilha hacker 8-bit entra rasgando!
+            });
+
+        } else {
+            // Margem de segurança: se o som de start já tiver acabado no meio do carregamento,
+            // solta a trilha sonora direto.
+            this.bgmOnda.play();
+        }
     }
 
 

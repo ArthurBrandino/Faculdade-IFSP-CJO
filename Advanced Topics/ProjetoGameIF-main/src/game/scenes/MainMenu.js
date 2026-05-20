@@ -9,18 +9,17 @@ export class MainMenu extends Scene
 
     create() {
         const { width, height } = this.scale;
+        this.musicaMenu = this.sound.add('TurnOn'); 
+        this.musicaMenu.play({ loop: true }); 
 
-        // 1. Fundo azul degradê (ou use uma imagem)
+        //Layout do Menu
         const fundo = this.add.rectangle(width/2, height/2, width, height, 0x4493ee);
-
         const barracima = this.add.rectangle(width / 2, 0, width, 150, 0x245edb);
-
         const barrabaixo = this.add.rectangle(width / 2, height, width, 150, 0x245edb);
         
-        // 2. Painel Lateral Esquerdo (Texto de Boas-vindas)
+        //Painel Esquerdo 
         this.logoXP = this.add.image(width * 0.2 + 210, height * 0.4 -20, 'logo_winxp');
         this.logoXP.setScale(0.4);
-            
         this.add.text(width * 0.1 + 100, height * 0.4 + 80, 'Para começar, clique no seu nome de usuário', { 
                 fontSize: '18px', 
                 fontFamily: 'Tahoma',
@@ -28,32 +27,38 @@ export class MainMenu extends Scene
                 shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 2, fill: true } // Sombra suave estilo XP
         });
 
-        // 3. Divisoria Central
+        //Divisor Central
         this.add.rectangle(width * 0.45, height/2, 2, height * 0.6, 0xffffff, 0.5);
 
-        // 4. Grupo de Usuário (Botão)
+        //Usuarios (Botao de Start)
         const userX = width * 0.55;
         const userY = height * 0.45;
 
-        // Avatar
+        //Foto de Perfil
         const avatar = this.add.image(userX, userY, 'avatar_player').setInteractive({ useHandCursor: true });
         
-        // Nome do Usuário
+        //Nome do Usuário
         const userName = this.add.text(userX + 60, userY - 10, 'ADMINISTRADOR', { 
             fontSize: '22px', fontWeight: 'bold', fontFamily: 'Tahoma' 
         }).setInteractive({ useHandCursor: true });
 
-        // Status
+        //Mensagem
         this.add.text(userX + 60, userY + 15, 'Clique aqui para logar', { 
             fontSize: '14px', fill: '#cccccc' 
         });
 
-        // 5. Lógica de Clique
+        // Lógica de Clique 
+
         const iniciarJogo = () => {
-            // Efeito de som de login do XP seria perfeito aqui!
+            this.musicaMenu.stop(); 
+
+            const efeitoStart = this.sound.add('Start');
+            efeitoStart.play();
+            
             this.cameras.main.fadeOut(1000, 0, 0, 0);
             this.cameras.main.once('camerafadeoutcomplete', () => {
-                this.scene.start('Game');
+                // Passamos o EFEITO START (que ainda está tocando) para a cena Game
+                this.scene.start('Game', { somTransicao: efeitoStart });
             });
         };
 
@@ -80,18 +85,17 @@ export class MainMenu extends Scene
         containerDesligar.on('pointerdown', () => {
             this.mostrarCreditos();
         });
-            
 
-       
-            containerDesligar.on('pointerover', () => {
-                desligarTexto.setStyle({ fill: '#ffcc00' });
-                containerDesligar.setScale(0.95); // Aumenta 10%
-            });
+        containerDesligar.on('pointerover', () => {
+            desligarTexto.setStyle({ fill: '#ffcc00' });
+            containerDesligar.setScale(0.95); // Aumenta 10%
+        });
 
-            containerDesligar.on('pointerout', () => {
-                desligarTexto.setStyle({ fill: '#fff' });
-                containerDesligar.setScale(1.0); // Volta ao tamanho normal
-            });
+        containerDesligar.on('pointerout', () => {
+            desligarTexto.setStyle({ fill: '#fff' });
+            containerDesligar.setScale(1.0); // Volta ao tamanho normal
+        });
+
     }
     mostrarCreditos() {
         const { width, height } = this.scale;

@@ -20,6 +20,9 @@ export class Defesa extends Phaser.GameObjects.Sprite {
         this.range = range;
         this.custo = custo;
 
+        this.somHit = scene.sound.add('DefenseHit');
+        this.podeTocarSomHit = true;
+
         // Criamos o objeto gráfico da barra de vida
         this.barraVida = scene.add.graphics();
         this.atualizarBarraVida();
@@ -27,23 +30,29 @@ export class Defesa extends Phaser.GameObjects.Sprite {
 
     receberDano(quantidade) {
         this.hp -= quantidade;
-        this.atualizarBarraVida(); // Atualiza o desenho da barra
-        
-        // Feedback visual de piscar
-        this.scene.tweens.add({
-            targets: this,
-            alpha: 0.5,       
-            tint: 0xffffff, 
-            duration: 50,
-            yoyo: true,
-            onComplete: () => {
-                this.alpha = 1;
-                this.clearTint(); 
-            }
-        });
 
         if (this.hp <= 0) {
             this.destruir();
+            return;
+        }
+
+        this.atualizarBarraVida(); // Atualiza o desenho da barra
+        
+        // Feedback visual e Sonoro
+        if (this.podeTocarSomHit) {
+            this.podeTocarSomHit = false;
+
+            if (this.somHit) this.somHit.play();
+
+            this.setTint(0xff0000);
+            this.alpha = 0.6; 
+
+            //Timer para evitar spam
+            this.scene.time.delayedCall(120, () => {
+                this.clearTint();          
+                this.alpha = 1;            
+                this.podeTocarSomHit = true; 
+            });
         }
     }
 
@@ -95,9 +104,13 @@ export class Defesa extends Phaser.GameObjects.Sprite {
     }
 
     destruir() {
-        // MUITO IMPORTANTE: Destruir a barra de vida também, 
-        // senão ela fica "flutuando" no mapa sozinha
+        if (this.somHit) {
+            this.somHit.stop();       
+            this.somHit.destroy();   
+        }
+
         if (this.barraVida) {
+            this.scene.sound.play('DefenseDestroy'); // Solta o som de explosão/limpeza
             this.barraVida.destroy();
         }
         this.destroy();

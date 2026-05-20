@@ -32,6 +32,7 @@ export class Preloader extends Scene
         //  Load the assets for the game - Replace with your own assets
         this.load.setPath('assets');
 
+        //Sprites
         this.load.image('menu', 'mapa/Menu.png');
         this.load.image('logo_winxp', 'mapa/Logo_winxp.png');
         this.load.image('on_button', 'mapa/ON_Sprite.png');
@@ -49,6 +50,20 @@ export class Preloader extends Scene
             frameWidth: 32, 
             frameHeight: 32 
         });
+
+        // Efeitos sonoros 
+        this.load.audio('key', 'audios/key.wav');
+        this.load.audio('TurnOn', 'audios/TurnOn.mp3');
+        this.load.audio('Start', 'audios/Startup.wav');
+        this.load.audio('Shutdown', 'audios/Shutdown.mp3');
+        this.load.audio('soundtrack', 'audios/GameSoundtrack.mp3');
+        this.load.audio('WaveClear', 'audios/waveclear.wav');
+        this.load.audio('hit_processador', 'audios/hitHurt.wav');
+        this.load.audio('death_processador', 'audios/processador_death.wav');
+        this.load.audio('EvilLaugh', 'audios/EvilLaugh.mp3');
+        this.load.audio('ClickerShoot', 'audios/MouseClick.mp3');
+        this.load.audio('DefenseDestroy', 'audios/DefenseDestroy.mp3');
+        this.load.audio('DefenseHit', 'audios/DefenseHit.wav');
     }
     create ()
     {

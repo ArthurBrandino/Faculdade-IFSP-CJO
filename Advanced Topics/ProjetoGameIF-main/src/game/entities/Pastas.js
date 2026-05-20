@@ -22,6 +22,7 @@ export class Pastas extends Phaser.GameObjects.Sprite {
             // Chamamos uma função na cena para adicionar os bits
             this.scene.adicionarBits(1);
             this.vida--;
+            this.scene.sound.play('key');
 
             this.scene.tweens.add({
                 targets: this,
