@@ -7,7 +7,7 @@ export class Clicker extends Defesa {
     static get RANGE() { return 300; }
     static get LARGURA() { return 100; }
     static get ALTURA() { return 100; }
-    static get VIDA() { return 50; }
+    static get VIDA() { return 5; }
     static get TAXA_TIRO() { return 1000; }
     static get DANO() { return 1; }
 

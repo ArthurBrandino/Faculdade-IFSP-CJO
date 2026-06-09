@@ -3,7 +3,11 @@ import { Game as MainGame } from './scenes/Game';
 import { GameOver } from './scenes/GameOver';
 import { MainMenu } from './scenes/MainMenu';
 import { Preloader } from './scenes/Preloader';
-import { AUTO, Game } from 'phaser';
+import { IntroCutscene } from './scenes/IntroCutscene'; 
+import { BadEnding } from './scenes/BadEnding';
+import { WinScreen } from './scenes/WinScreen';
+import { GoodEnding } from './scenes/GoodEnding';
+import { AUTO, Game, Scale } from 'phaser'; // Ajustado para usar Scale diretamente do Phaser se necessário
 
 const config = {
     type: AUTO,
@@ -12,22 +16,27 @@ const config = {
     parent: 'game-container',
     backgroundColor: '#028af8',
     scale: {
-        mode: Phaser.Scale.FIT,
-        autoCenter: Phaser.Scale.CENTER_BOTH
+        mode: Scale.FIT, // Usando a importação limpa ou Phaser.Scale.FIT
+        autoCenter: Scale.CENTER_BOTH
     },
     physics: {
         default: 'arcade',
         arcade: {
             gravity: { y: 0 }, 
-            debug: true       
+            debug: false       
         }
     },
+    // O Phaser lê o array e define a PRIMEIRA cena como a que vai iniciar o ciclo de vida (Boot)
     scene: [
         Boot,
         Preloader,
         MainMenu,
+        IntroCutscene,
         MainGame,
-        GameOver
+        GameOver,
+        BadEnding,
+        WinScreen, 
+        GoodEnding 
     ]
 };
 

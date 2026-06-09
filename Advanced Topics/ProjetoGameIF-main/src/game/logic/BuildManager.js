@@ -8,6 +8,8 @@ export class BuildManager {
             .setOrigin(0.5, 0.5);
         this.rangeGraphics = scene.previewRange;
         this.precoText = scene.previewPreco;
+
+        this.somErro = scene.sound.add('Error');
     }
 
     validarConstrucao(x, y) {
@@ -23,20 +25,23 @@ export class BuildManager {
 
         const temGrana = this.scene.bits >= dados.custo;
 
+        // --- MARGEM DE ERRO (TOLERÂNCIA) ---
+        const margemTolerancia = 8; 
+
         const novaArea = new Phaser.Geom.Rectangle(
-            snapX - dados.largura / 2 + 1, 
-            snapY - dados.altura / 2 + 1, 
-            dados.largura - 2, 
-            dados.altura - 2
+            snapX - dados.largura / 2 + (margemTolerancia / 2), 
+            snapY - dados.altura / 2 + (margemTolerancia / 2), 
+            dados.largura - margemTolerancia, 
+            dados.altura - margemTolerancia
         );
 
         // Checa colisão com torres existentes
         const ocupado = this.scene.defesas.getChildren().some(defesa => {
             const areaLogicaExistente = new Phaser.Geom.Rectangle(
-                defesa.x - defesa.width / 2 + 1,
-                defesa.y - defesa.height / 2 + 1,
-                defesa.width - 2,
-                defesa.height - 2
+                defesa.x - defesa.width / 2 + (margemTolerancia / 2),
+                defesa.y - defesa.height / 2 + (margemTolerancia / 2),
+                defesa.width - margemTolerancia,
+                defesa.height - margemTolerancia
             );
             return Phaser.Geom.Intersects.RectangleToRectangle(novaArea, areaLogicaExistente);
         });
@@ -54,18 +59,31 @@ export class BuildManager {
 
     tentarConstruir(x, y) {
         const dados = this.scene.dadosDefesas[this.scene.selecionada];
-        if (!dados || dados.modo !== 'construcao') return;
+        if (!dados || dados.modo !== 'construcao') return false;
 
         const validacao = this.validarConstrucao(x, y);
 
         if (validacao.podeConstruir && validacao.temGrana) {
             const novaDefesa = new dados.classe(this.scene, validacao.x, validacao.y);
+            
+            // CORREÇÃO: Passando as variáveis certas do objeto 'validacao'
+            if (this.scene.enzinho && typeof this.scene.enzinho.interagir === 'function') {
+                this.scene.enzinho.interagir({ x: validacao.x, y: validacao.y });
+            }
 
             if (novaDefesa) {
+                // CORREÇÃO: Utilizando a função centralizada do seu UIManager (igual no Game.js)
                 this.scene.bits -= validacao.custo;
-                this.scene.textoBits.setText('Bits: ' + this.scene.bits);
+                if (this.scene.uiManager && typeof this.scene.uiManager.atualizarBits === 'function') {
+                    this.scene.uiManager.atualizarBits(this.scene.bits);
+                }
+                
                 this.scene.defesas.add(novaDefesa);
                 return true;
+            }
+        } else {
+            if (this.somErro && !this.somErro.isPlaying) {
+                this.somErro.play({ volume: 0.6 });
             }
         }
         return false;
@@ -85,7 +103,6 @@ export class BuildManager {
         const nomeTextura = `spr_${dadosAtuais.nome.toLowerCase()}`;
         this.preview.setTexture(nomeTextura); 
         
-        // Força o tamanho do sprite para o que está definido nos dados da torre
         this.preview.setDisplaySize(dadosAtuais.largura, dadosAtuais.altura);
         this.preview.setPosition(validacao.x, validacao.y);
 
@@ -94,7 +111,8 @@ export class BuildManager {
         this.precoText.setText(`${dadosAtuais.custo} bits`);
 
         const podeColocar = validacao.podeConstruir && validacao.temGrana;
-        const corFeedback = podeColocar ? 0x00ff00 : 0xff0000;
+        
+        const corFeedback = podeColocar ? 0x39ff14 : 0xff0000;
 
         this.preview.setTint(corFeedback);
 

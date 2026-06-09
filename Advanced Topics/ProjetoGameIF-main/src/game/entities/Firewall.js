@@ -5,7 +5,7 @@ export class Firewall extends Defesa {
     static get CUSTO() { return 10; }
     static get LARGURA() { return 50; }
     static get ALTURA() { return 50; }
-    static get VIDA() { return 200; }
+    static get VIDA() { return 2; }
 
     constructor(scene, x, y) {
         super(

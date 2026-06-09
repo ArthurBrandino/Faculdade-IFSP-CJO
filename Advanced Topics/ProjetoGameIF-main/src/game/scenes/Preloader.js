@@ -34,11 +34,13 @@ export class Preloader extends Scene
 
         //Sprites
         this.load.image('menu', 'mapa/Menu.png');
+        this.load.image('avatar', 'mapa/Avatar.png');
         this.load.image('logo_winxp', 'mapa/Logo_winxp.png');
         this.load.image('on_button', 'mapa/ON_Sprite.png');
         this.load.image('meu-wallpaper', 'mapa/background.jpg');
         this.load.image('logo', 'logo.png'); 
         this.load.image('spr_clicker', 'defesas/Clicker_Sprite.png');
+        this.load.image('spr_lixeira', 'defesas/Trashcan_Sprite.png');
         this.load.image('spr_firewall', 'defesas/Firewall_Sprite.png');
         this.load.spritesheet('spr_worm', 'inimigos/Worm_Sprite.png', { 
             frameWidth: 16, 
@@ -51,6 +53,34 @@ export class Preloader extends Scene
             frameHeight: 32 
         });
 
+        this.load.image('processador', 'mapa/processador.png');
+
+        this.load.image('pointer-icon', 'mapa/pointer.png');
+
+        this.load.spritesheet('player_attack', 'player/attack.png', {
+            frameWidth: 24,  
+            frameHeight: 24
+        });
+        this.load.spritesheet('player_idle', 'player/idle.png', {
+            frameWidth: 24,  
+            frameHeight: 24
+        });
+        this.load.spritesheet('player_run', 'player/run.png', {
+            frameWidth: 24,  
+            frameHeight: 24
+        });
+         this.load.spritesheet('player_interact', 'player/interact.png', {
+            frameWidth: 24,  
+            frameHeight: 24
+        });
+
+        this.load.image('game_background', 'mapa/BackgroundGame.gif');
+
+        //Cutscenes
+        this.load.image('introducao_cutscene', 'cutscenes/Introducao_cutscene.jpeg');
+        this.load.image('bad_ending_cutscene', 'cutscenes/Bad_ending_cutscene.jpeg');
+        this.load.image('good_ending_cutscene', 'cutscenes/Good_ending_cutscene.jpeg');
+
         // Efeitos sonoros 
         this.load.audio('key', 'audios/key.wav');
         this.load.audio('TurnOn', 'audios/TurnOn.mp3');
@@ -59,12 +89,17 @@ export class Preloader extends Scene
         this.load.audio('soundtrack', 'audios/GameSoundtrack.mp3');
         this.load.audio('WaveClear', 'audios/waveclear.wav');
         this.load.audio('hit_processador', 'audios/hitHurt.wav');
+        this.load.audio('hit_enemy', 'audios/hitEnemy.wav');
         this.load.audio('death_processador', 'audios/processador_death.wav');
         this.load.audio('EvilLaugh', 'audios/EvilLaugh.mp3');
         this.load.audio('ClickerShoot', 'audios/MouseClick.mp3');
         this.load.audio('DefenseDestroy', 'audios/DefenseDestroy.mp3');
         this.load.audio('DefenseHit', 'audios/DefenseHit.wav');
-    }
+        this.load.audio('TrashProcessing', 'audios/TrashProcessing.mp3');
+        this.load.audio('TrashComplete', 'audios/TrashComplete.mp3');
+        this.load.audio('som_vitoria', 'audios/WinSound.mp3');
+        this.load.audio('Error', 'audios/Error.mp3');
+    }   
     create ()
     {
         //  When all the assets have loaded, it's often worth creating global objects here that the rest of the game can use.

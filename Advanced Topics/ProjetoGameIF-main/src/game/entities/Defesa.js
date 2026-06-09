@@ -57,20 +57,22 @@ export class Defesa extends Phaser.GameObjects.Sprite {
     }
 
     procurarAlvo() {
-        //Pega todos os inimigos do grupo
+        // Pega todos os inimigos do grupo
         const listaInimigos = this.scene.inimigos.getChildren();
 
         return listaInimigos.find(inimigo => {
             // 2. Filtro de Atividade
             if (!inimigo || !inimigo.active || !inimigo.body || inimigo.estaPreso) return false;
 
+            // === NOVO: Filtro de Inalvejável (Ignora o ILY) ===
+            // Se o inimigo tiver a flag 'alvejavel' definida como false, ele é ignorado pela mira
+            if (inimigo.alvejavel === false) return false;
 
             // 3. Filtro de Distância
             const distancia = Phaser.Math.Distance.Between(this.x, this.y, inimigo.x, inimigo.y);
             if (distancia > this.range) return false;
 
             // 4. Filtro de Segmento (Worm)
-            // Usamos uma verificação mais simples: se tem a propriedade 'ehSegmento' e ela é true, ignora
             if (inimigo.ehSegmento === true) {
                 return false;
             }

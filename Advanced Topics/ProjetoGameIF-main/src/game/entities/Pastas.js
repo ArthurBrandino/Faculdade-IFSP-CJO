@@ -6,6 +6,7 @@ export class Pastas extends Phaser.GameObjects.Sprite {
         
         this.setFrame(1);
         this.vida = Phaser.Math.Between(3, 6); // vida aleatoria entre 3 e 6
+        this.bits = Phaser.Math.Between(5, 10);
 
         scene.add.existing(this);
         scene.physics.add.existing(this, true); // true para ser estático
@@ -18,9 +19,9 @@ export class Pastas extends Phaser.GameObjects.Sprite {
         const player = this.scene.enzinho;
         const dist = Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y);
 
-        if (dist < 150 ) {
+        if (dist < 500 ) {
             // Chamamos uma função na cena para adicionar os bits
-            this.scene.adicionarBits(1);
+            this.scene.adicionarBits(this.bits);
             this.vida--;
             this.scene.sound.play('key');
 

@@ -35,8 +35,10 @@ export class MainMenu extends Scene
         const userY = height * 0.45;
 
         //Foto de Perfil
-        const avatar = this.add.image(userX, userY, 'avatar_player').setInteractive({ useHandCursor: true });
-        
+        const avatar = this.add.image(userX, userY, 'avatar')
+            .setScale(0.08) 
+            .setInteractive({ useHandCursor: true });
+            
         //Nome do Usuário
         const userName = this.add.text(userX + 60, userY - 10, 'ADMINISTRADOR', { 
             fontSize: '22px', fontWeight: 'bold', fontFamily: 'Tahoma' 
@@ -58,7 +60,7 @@ export class MainMenu extends Scene
             this.cameras.main.fadeOut(1000, 0, 0, 0);
             this.cameras.main.once('camerafadeoutcomplete', () => {
                 // Passamos o EFEITO START (que ainda está tocando) para a cena Game
-                this.scene.start('Game', { somTransicao: efeitoStart });
+                this.scene.start('IntroCutscene', { somTransicao: efeitoStart });
             });
         };
 

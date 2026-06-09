@@ -3,7 +3,7 @@ import { Worm } from "./Worm";
 
 export class Trojan extends Inimigo {
     constructor(scene, x, y){
-        const velocidade = 30;
+        const velocidade = 60;
         const vida = 40;
         const dano = 10;
         const largura = 50; 

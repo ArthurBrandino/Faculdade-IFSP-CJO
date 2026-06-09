@@ -27,6 +27,13 @@ export class Game extends Scene {
     }
 
     create() {
+        // --- 0. BACKGROUND DINÂMICO ESTILO MATRIX ---
+        this.backgroundCyber = this.add.tileSprite(0, 0, 2000, 2000, 'game_background');
+        this.backgroundCyber.setOrigin(0, 0);
+        this.backgroundCyber.setDepth(-1); 
+        this.backgroundCyber.tileScaleX = 1;
+        this.backgroundCyber.tileScaleY = 1;
+
         // 1. ESTADO INICIAL
         this.bits = 0;
         this.selecionada = 1;
@@ -60,22 +67,38 @@ export class Game extends Scene {
         this.waveManager.iniciarSistema();
 
         // 7. CÂMERA SEGUIR JOGADOR
+        this.cameras.main.setBounds(0, 0, 2000, 2000);
         this.cameras.main.startFollow(this.enzinho, true);
 
+        // 8. ESCUTA DE TECLAS DE ATALHO (SLOTS)
         this.input.keyboard.on('keydown', (event) => {
             const num = parseInt(event.key);
             if (num >= 1 && num <= 4) {
-                // Chama a função do UIManager para trocar o slot visualmente e a lógica
                 this.uiManager.selecionarSlot(num);
             }
         });
 
-        this.input.keyboard.on('keydown', (event) => {
-            const num = parseInt(event.key);
-            if (num >= 1 && num <= 4) {
-                this.uiManager.selecionarSlot(num);
+        // =====================================================================
+        // NOVO: GERENCIADOR DE CLIQUES PARA DISPARAR O ATAQUE VISUAL
+        // =====================================================================
+        this.input.on('pointerdown', (pointer) => {
+            // Só ataca se o slot selecionado for o 1 (Ação / Combate)
+            if (this.selecionada === 1) {
+                
+                // Converte a posição do clique na tela para coordenadas reais do mapa do jogo
+                const worldPoint = pointer.positionToCamera(this.cameras.main);
+                
+                // Dispara o método de ataque do jogador passando as listas necessárias
+                // para sua lógica de colisão/dano futura
+                this.enzinho.atacar(worldPoint, this.inimigos, this.defesas);
+                
+                // Opcional: Se você quiser rodar funções extras de dano direto do CombatManager
+                if (this.combatManager && typeof this.combatManager.processarCliqueAtaque === 'function') {
+                    this.combatManager.processarCliqueAtaque(worldPoint);
+                }
             }
         });
+        // =====================================================================
 
         // --- AJUSTE DA TRILHA RETRÔ COORDENADA ---
         this.bgmOnda = this.sound.add('soundtrack', {
@@ -83,23 +106,16 @@ export class Game extends Scene {
             volume: 0.35 
         });
 
-        // O JOGO SÓ SOLTA A MÚSICA QUANDO O SOM DE START TERMINAR:
         if (this.somTransicao && this.somTransicao.isPlaying) {
-            
-            // Quando o barulho de inicialização do Windows XP acabar...
             this.somTransicao.once('complete', () => {
-                this.bgmOnda.play(); // ...a trilha hacker 8-bit entra rasgando!
+                this.bgmOnda.play(); 
             });
-
         } else {
-            // Margem de segurança: se o som de start já tiver acabado no meio do carregamento,
-            // solta a trilha sonora direto.
             this.bgmOnda.play();
         }
     }
 
 
-    // Centraliza os dados das torres para não poluir o create
     configurarDadosDefesas() {
         return {
             1: { nome: 'Combate', modo: 'acao' },
@@ -107,6 +123,37 @@ export class Game extends Scene {
             3: { nome: 'Lixeira', largura: Lixeira.LARGURA, altura: Lixeira.ALTURA, cor: Lixeira.COR, custo: Lixeira.CUSTO, range: Lixeira.RANGE, modo: 'construcao', classe: Lixeira },
             4: { nome: 'Firewall', largura: Firewall.LARGURA, altura: Firewall.ALTURA, cor: Firewall.COR, custo: Firewall.CUSTO, modo: 'construcao', classe: Firewall }
         };
+    }
+
+    mudarMatrizBackground() {
+        const progressoCor = { valor: 0 };
+        const corOriginal = Phaser.Display.Color.HexStringToColor('#ffffff'); // Branco normal
+        
+        // MUDANÇA AQUI: Usamos um vermelho super saturado/neon com alta luminosidade nos outros canais
+        // Em vez de puxar para o escuro, isso força o Phaser a clarear os pixels
+        const corAlerta = Phaser.Display.Color.HexStringToColor('#ff0000');   
+
+        this.tweens.add({
+            targets: progressoCor,
+            valor: 100,
+            duration: 2000, 
+            ease: 'Quad.easeOut',
+            onUpdate: () => {
+                const corMisturada = Phaser.Display.Color.Interpolate.ColorWithColor(
+                    corOriginal,
+                    corAlerta,
+                    100,
+                    progressoCor.valor
+                );
+                const corHex = Phaser.Display.Color.GetColor(corMisturada.r, corMisturada.g, corMisturada.b);
+                
+                if (this.backgroundCyber) {
+                    // MUDANÇA AQUI: setTintFill ou setTintLight evitam o efeito "apagado" do setTint comum
+                    // Se o seu Sprite aceitar bem, o setTint normal com a cor '#ff8888' já vai clarear MUITO.
+                    this.backgroundCyber.setTint(corHex);
+                }
+            }
+        });
     }
 
     adicionarBits(valor) {
@@ -135,6 +182,11 @@ export class Game extends Scene {
     update() {
         if (this.enzinho?.update) this.enzinho.update();
         
+        if (this.backgroundCyber) {
+            this.backgroundCyber.tilePositionY -= 1.7; // Move para cima bem suave
+            this.backgroundCyber.tilePositionX += 0.4; // Desloca de leve para o lado
+        }
+
         this.buildManager.atualizarPreview(
             this.input.activePointer, 
             this.dadosDefesas[this.selecionada]

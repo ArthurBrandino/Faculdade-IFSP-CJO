@@ -69,11 +69,26 @@ export class UIManager {
         const gameW = 950;
         const gameH = 550;
         
-        const molduraX = this.offBack + ((this.w - gameW) / 2);
-        const molduraY = this.offBack + 100; 
+        // Posição exata na tela onde a câmera do jogo (main) foi colocada
+        const cameraX = (this.w - gameW) / 2;
+        const cameraY = 100;
 
+        // Posição na ilha de fundo estático
+        const molduraX = this.offBack + cameraX;
+        const molduraY = this.offBack + cameraY; 
+
+        // Cria a barra e o fundo cinza clássico atrás do jogo
         this.janelaJogoContainer = this.criarMolduraWinXP(molduraX, molduraY, gameW, gameH, "C:\\Games\\Cyber_Defense.exe");
 
+        // === CORREÇÃO DA BORDA PRETA ===
+        // Criamos um contorno que fica 2 pixels para FORA da câmera do jogo. 
+        // Assim, o fundo verde escuro da câmera main não consegue cobrir o traço!
+        const bordaJogo = this.scene.add.graphics();
+        bordaJogo.lineStyle(3, 0x000000); // Linha levemente mais grossa (3px) para dar o destaque do WinXP
+        
+        // Desenha o retângulo exatamente ao redor do viewport da câmera principal (na coordenada da backCamera)
+        bordaJogo.strokeRect(molduraX - 1, molduraY - 1, gameW + 2, gameH + 2);
+        bordaJogo.setDepth(10); // Garante que fique acima do fundo cinza
 
         const estiloValor = { fontSize: '28px', fill: '#000', fontFamily: 'Courier', fontWeight: 'bold' };
 
@@ -101,6 +116,7 @@ export class UIManager {
         this.onUpdateBits = (valor) => {
             if (!this.scene.textoBits || !this.scene.textoBits.scene) return; 
             this.scene.textoBits.setText('BITS: ' + valor);
+            this.atualizarCoresPorPreco(valor);
         };
 
         this.scene.events.on('update-hp', this.onUpdateHP);
@@ -116,7 +132,6 @@ export class UIManager {
     }
 
     atualizarTextoWave(numero) {
-        
         const waveFormatada = String(numero).padStart(2, '0');
         this.scene.textoTurno.setText(`WAVE: ${waveFormatada}`);
     }
@@ -146,22 +161,22 @@ export class UIManager {
     }
 
     criarIconesHotbar() {
-        
         const off = this.offHotbar;
         const camera = this.scene.hotbarCamera;
         const worldY = off + (camera.height / 2);
 
         this.criarBotaoStart(off, worldY);
-
-        this.criarRelogio(off, worldY, camera);
-
-        this.criarItens(off, worldY, camera)
+        this.criarRelogio(off, worldY, camera, camera.height);
+        this.criarItens(off, worldY, camera);
     }
 
     applyCameraIgnores() {
+        // Coleta referências válidas de textos da hotbar para incluir nas travas de câmera
+        const textosHotbar = (this.textosSlots || []).filter(el => el != null);
+
         const tudoUI = [
             this.scene.textoBits, this.scene.textoTurno, 
-            this.barraVida, this.textoHUD, ...(this.iconesRef || [])
+            this.barraVida, this.textoHUD, ...(this.iconesRef || []), ...textosHotbar
         ].filter(el => el != null);
 
         this.scene.cameras.main.ignore([...tudoUI, this.globalBG]);
@@ -176,15 +191,12 @@ export class UIManager {
 
     setupListeners() {
         this.scene.events.on('update-timer', (texto) => {
-            // VERIFICAÇÃO BLINDADA: 
-            // O texto existe E a cena dele ainda está ativa?
             if (this.txtTempoWave && this.txtTempoWave.scene && this.txtTempoWave.scene.sys.isActive()) {
                 this.txtTempoWave.setText(texto);
                 this.txtTempoWave.setFill(texto.includes("DANGER") ? '#ff0000' : '#00ff00');
             }
         });
 
-        // Mesma lógica aqui para evitar erros em outras partes da UI
         this.scene.events.on('proxima-wave', (numeroDaWave) => {
             if (this.scene && this.scene.sys.isActive()) {
                 this.atualizarTextoWave(numeroDaWave);
@@ -201,6 +213,7 @@ export class UIManager {
 
     atualizarBits(valor) {
         if (this.scene.textoBits) this.scene.textoBits.setText('BITS: ' + valor);
+        this.atualizarCoresPorPreco(valor);
     }
 
     criarMolduraWinXP(x, y, largura, altura, tituloTexto) {
@@ -211,37 +224,37 @@ export class UIManager {
         const barra = this.scene.add.rectangle(x, y, largura, 25, 0x000080).setOrigin(0, 0);
         
         // 3. Texto do Título
-        this.scene.add.text(x + 5, y + 5, tituloTexto, { 
+        const tituloTxt = this.scene.add.text(x + 5, y + 5, tituloTexto, { 
             fontSize: '12px', fill: '#fff', fontWeight: 'bold', fontFamily: 'Tahoma' 
         });
 
-        // 4. Borda Preta
+        // 4. Borda Preta (Garante contorno 2px idêntico em todas as janelas)
         const borda = this.scene.add.graphics();
         borda.lineStyle(2, 0x000000);
         borda.strokeRect(x, y, largura, altura);
 
-        return { fundo, barra };
+        // Se for a moldura da tela de jogo, guardamos a borda para controle de profundidade
+        if(tituloTexto.includes("Cyber_Defense.exe")) {
+            borda.setDepth(1);
+        }
+
+        return { fundo, barra, borda };
     }
 
     criarBotaoStart(off, worldY){
-        
-        // ---  BOTÃO START  ---
         const startX = off + 85; 
         const startWidth = 110;  
         const startHeight = 34;
 
-        // Base Verde 
         this.btnStart = this.scene.add.rectangle(startX, worldY, startWidth, startHeight, 0x388A34)
             .setStrokeStyle(1.5, 0x2E6A29) 
             .setInteractive({ useHandCursor: true })
             .setDepth(2000);
 
-        //Logo 
         this.menuLogo = this.scene.add.image(startX - (startWidth / 2) + 18, worldY, 'menu')
             .setScale(0.25)
             .setDepth(2001);
 
-        // 3. Texto 
         this.txtStart = this.scene.add.text(startX + 12, worldY, 'start', {
             fontSize: '16px', 
             fill: '#ffffff', 
@@ -251,14 +264,12 @@ export class UIManager {
             shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 1, stroke: false, fill: true }
         }).setOrigin(0.5).setDepth(2001);
 
-        // --- INTERATIVIDADE DO BOTÃO START ---
-        this.btnStart.on('pointerover', () => this.btnStart.setFillStyle(0x4CA647));  // Brilha ao passar o mouse
-        this.btnStart.on('pointerout', () => this.btnStart.setFillStyle(0x388A34));   // Restaura a cor padrão
-        this.btnStart.on('pointerdown', () => this.btnStart.setFillStyle(0x286325));  // Escurece ao clicar
+        this.btnStart.on('pointerover', () => this.btnStart.setFillStyle(0x4CA647));  
+        this.btnStart.on('pointerout', () => this.btnStart.setFillStyle(0x388A34));   
+        this.btnStart.on('pointerdown', () => this.btnStart.setFillStyle(0x286325));  
     }
 
     criarRelogio(off, worldY, camera, barH){
-        // ÁREA DO RELÓGIO
         const trayX = off + camera.width - 75;
         const trayWidth = 160;
         const trayHeight = barH;
@@ -276,61 +287,101 @@ export class UIManager {
     }
 
     criarItens(off, worldY, camera){
-         // --- CRIAÇÃO DOS SLOTS DE ITENS (MANTIDA A LÓGICA ORIGINAL) ---
-        const larguraSlot = 55;
+        const larguraSlot = 48; 
         const espacamento = 45;
         const totalSlots = 4;
         const larguraGrupo = (totalSlots * larguraSlot) + ((totalSlots - 1) * espacamento);
         const inicioX = (camera.width / 2) - (larguraGrupo / 2) + (larguraSlot / 2);
 
+        const slotY = worldY - 6;
+
         const itensHotbar = [
-            { nome: 'CURSOR', preco: 0 },
-            { nome: 'CLICKER', preco: Clicker.CUSTO },
-            { nome: 'LIXEIRA', preco: Lixeira.CUSTO },
-            { nome: 'FIREWALL', preco: Firewall.CUSTO }
+            { nome: 'CURSOR', preco: 0, sprite: 'pointer-icon' },
+            { nome: 'CLICKER', preco: Clicker.CUSTO, sprite: 'spr_clicker' },
+            { nome: 'LIXEIRA', preco: Lixeira.CUSTO, sprite: 'spr_lixeira' }, 
+            { nome: 'FIREWALL', preco: Firewall.CUSTO, sprite: 'spr_firewall' }
         ];
 
         this.slots = [];
-        // Atualizado o array de referências para incluir as novas peças visuais
+        this.textosSlots = []; 
+        this.precosSlots = []; 
         this.iconesRef = [this.btnStart, this.menuLogo, this.txtStart, this.trayBG, this.txtTempoWave];
 
         itensHotbar.forEach((item, i) => {
             const x = off + inicioX + i * (larguraSlot + espacamento);
 
-            // Estética cinza clássica de botão do Windows para os slots desmarcados
-            const bg = this.scene.add.rectangle(x, worldY, larguraSlot, larguraSlot, 0xd4d0c8)
-                .setStrokeStyle(1.5, 0xffffff) // Borda clara imitando relevo clássico
+            const bg = this.scene.add.rectangle(x, slotY, larguraSlot, larguraSlot, 0xd4d0c8)
+                .setStrokeStyle(1.5, 0xffffff) 
                 .setInteractive({ useHandCursor: true })
                 .setDepth(2000);
 
-            const txtNum = this.scene.add.text(x - 18, worldY - 18, i + 1, { 
+            const txtNum = this.scene.add.text(x - (larguraSlot / 2) + 4, slotY - (larguraSlot / 2) + 2, i + 1, { 
                 fontSize: '11px', 
-                fill: '#808080', 
+                fill: '#505050', 
                 fontFamily: 'Tahoma, Arial, sans-serif',
                 fontWeight: 'bold'
-            }).setOrigin(0.5).setDepth(2001);
+            }).setOrigin(0, 0).setDepth(2002);
 
-            const txtNome = this.scene.add.text(x, worldY - 2, item.nome, { 
-                fontSize: '10px', 
-                fill: '#000000',
-                fontFamily: 'Tahoma, Arial, sans-serif',
-                fontWeight: 'bold'
-            }).setOrigin(0.5).setDepth(2001);
+            if (item.sprite && this.scene.textures.exists(item.sprite)) {
+                const spriteIcone = this.scene.add.image(x, slotY, item.sprite)
+                    .setDepth(2001);
+                
+                // === ALTERAÇÃO DAQUI PARA ABAIXO ===
+                // Se for o cursor, ele fica menor (20x20 pixels). Se forem as defesas, usam o tamanho padrão.
+                if (item.sprite === 'pointer-icon') {
+                    spriteIcone.setDisplaySize(20, 30); 
+                    // Dica extra: Se ele ficar descentralizado por causa do design da seta do mouse, 
+                    // você pode ajustar levemente a posição dele descomentando a linha abaixo:
+                    // spriteIcone.setX(x + 2); 
+                } else {
+                    spriteIcone.setDisplaySize(larguraSlot - 12, larguraSlot - 12);
+                }
+                // === FIM DA ALTERAÇÃO ===
 
-            if (item.preco > 0) {
-                const txtPreco = this.scene.add.text(x, worldY + 14, `$${item.preco}`, { 
-                    fontSize: '10px', 
-                    fill: '#008000', // Preco em verde clássico de sistema
-                    fontFamily: 'Tahoma, Arial, sans-serif'
-                }).setOrigin(0.5).setDepth(2001);
-                this.iconesRef.push(txtPreco);
+                this.iconesRef.push(spriteIcone);
             }
 
+            const textoExibicao = item.preco > 0 ? `${item.nome} (${item.preco}B)` : item.nome;
+            const yTexto = slotY + (larguraSlot / 2) + 6;
+
+            const txtInfo = this.scene.add.text(x, yTexto, textoExibicao, { 
+                fontSize: '10px', 
+                fill: '#ffffff', 
+                fontFamily: 'Tahoma, Arial, sans-serif',
+                fontWeight: 'bold',
+                shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 1, fill: true }
+            }).setOrigin(0.5, 0).setDepth(2001);
+
             this.slots[i + 1] = bg;
+            this.textosSlots[i + 1] = txtInfo; 
+            this.precosSlots[i + 1] = item.preco; 
+            
             bg.on('pointerdown', () => this.selecionarSlot(i + 1));
-            this.iconesRef.push(bg, txtNum, txtNome);
+            this.iconesRef.push(bg, txtNum, txtInfo);
         });
 
+        this.atualizarCoresPorPreco(this.scene.bits || 0);
         this.selecionarSlot(1);
+    }
+
+    atualizarCoresPorPreco(bitsAtuais) {
+        if (!this.textosSlots) return;
+
+        for (let i = 1; i <= 4; i++) {
+            const texto = this.textosSlots[i];
+            const preco = this.precosSlots[i];
+
+            if (texto) {
+                if (i === 1) {
+                    texto.setFill('#ffffff');
+                } else {
+                    if (bitsAtuais >= preco) {
+                        texto.setFill('#39ff14');
+                    } else {
+                        texto.setFill('#ff0000');
+                    }
+                }
+            }
+        }
     }
 }

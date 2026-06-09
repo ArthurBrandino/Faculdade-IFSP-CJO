@@ -17,7 +17,7 @@ export class Inimigo extends Phaser.GameObjects.Sprite {
         this.frequencia = freq; 
         this.amplitude = amp;
         this.alvo = scene.processador; // Todos focam no processador por padrão
-
+        this.alvejavel = true;
         
     }
 

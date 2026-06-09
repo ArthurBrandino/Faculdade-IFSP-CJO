@@ -4,6 +4,8 @@ import { Worm } from "../entities/Worm.js";
 export class CombatManager {
     constructor(scene) {
         this.scene = scene;
+
+        this.somAtaque = scene.sound.add('hit_enemy');
     }
 
     executarAcao(worldPoint) {
@@ -36,6 +38,7 @@ export class CombatManager {
             const alvoUnico = inimigosNoRaio[0];
             if (alvoUnico && alvoUnico.receberDano) {
                 alvoUnico.receberDano(this.scene.enzinho.danoAtaque);
+                this.somAtaque.play({ volume: 0.6 });
             }
         }
     }
