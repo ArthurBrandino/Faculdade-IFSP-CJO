@@ -10,15 +10,15 @@ export class WinScreen extends Phaser.Scene {
     }
 
     create() {
-        // 1. Toca o áudio de vitória
+        // --- 1. GERENCIAMENTO DE ÁUDIO DE VITÓRIA ---
         this.sound.play('som_vitoria', { volume: 0.8 });
 
-        // 2. Adiciona o plano de fundo 
+        // --- 2. CONFIGURAÇÃO ESTÉTICA DO DESKTOP ---
         let bg = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'meu-wallpaper');
         bg.setOrigin(0.5);
         bg.setDisplaySize(this.cameras.main.width, this.cameras.main.height);
 
-        // 3. Janela Pop-up de Sucesso do Sistema 
+        // --- 3. POP-UP DE SUCESSO (ESTILO POP-UP RESTRITO) ---
         let boxWidth = 500;
         let boxHeight = 250;
         let dialogBox = this.add.graphics();
@@ -26,15 +26,14 @@ export class WinScreen extends Phaser.Scene {
         dialogBox.lineStyle(3, 0xffffff, 1);
         
         let startX = this.cameras.main.centerX - (boxWidth / 2);
-        let startY = this.cameras.main.centerY - (boxHeight / 2) - 30; // Ajustado centralização vertical
+        let startY = this.cameras.main.centerY - (boxHeight / 2) - 30; 
         dialogBox.fillRect(startX, startY, boxWidth, boxHeight);
         dialogBox.strokeRect(startX, startY, boxWidth, boxHeight);
 
-        // Barra de Título Azul da Janela de Sucesso
+        // Barra de Título
         dialogBox.fillStyle(0x0055ea, 1);
         dialogBox.fillRect(startX + 4, startY + 4, boxWidth - 8, 30);
 
-        // Texto da Barra de Título
         this.add.text(startX + 15, startY + 12, "Sucesso do Sistema", {
             fontFamily: 'monospace',
             fontSize: '14px',
@@ -42,7 +41,7 @@ export class WinScreen extends Phaser.Scene {
             fill: '#ffffff'
         });
 
-        // Texto da Mensagem Interna
+        // Mensagem de Feedback Técnico
         this.add.text(this.cameras.main.centerX, startY + 95, 
             "O Rootkit foi removido com sucesso.\n\nSua CPU está operando a 100% de integridade e o computador está salvo!", {
             fontFamily: 'monospace',
@@ -52,18 +51,16 @@ export class WinScreen extends Phaser.Scene {
             wordWrap: { width: boxWidth - 40 }
         }).setOrigin(0.5);
 
-        // 4. BOTÃO "CONTINUAR"
+        // --- 4. INTERFACE DO BOTÃO CONTINUAR (RELEVO 3D) ---
         let btnWidth = 120;
         let btnHeight = 30;
         let btnX = this.cameras.main.centerX;
-        let btnY = startY + boxHeight - 40; // Posicionado na parte inferior da caixinha cinza
+        let btnY = startY + boxHeight - 40; 
 
-        // Criando o fundo do botão cinza com borda simulando relevo 3D
         this.btnOk = this.add.rectangle(btnX, btnY, btnWidth, btnHeight, 0xE0E0E0)
             .setStrokeStyle(1.5, 0x808080)
             .setInteractive({ useHandCursor: true });
 
-        // Texto interno do botão
         this.txtOk = this.add.text(btnX, btnY, 'CONTINUAR', {
             fontFamily: 'Tahoma, Arial, sans-serif',
             fontSize: '14px',
@@ -71,20 +68,18 @@ export class WinScreen extends Phaser.Scene {
             fill: '#000000'
         }).setOrigin(0.5);
 
-        // Efeitos visuais de feedback do mouse passando por cima do botão 
+        // Eventos Hover e Clique do Botão Ok
         this.btnOk.on('pointerover', () => this.btnOk.setFillStyle(0xF2F2F2));
         this.btnOk.on('pointerout', () => this.btnOk.setFillStyle(0xE0E0E0));
-        
-        // Chama a transição
         this.btnOk.on('pointerdown', () => {
             this.btnOk.setFillStyle(0xD0D0D0);
             this.goToGoodEnding();
         });
 
-        // 5. === INICIALIZAÇÃO DA SUA BARRA DE TAREFAS AMPLIADA ===
+        // --- 5. RENDERIZAÇÃO DA BARRA DE TAREFAS (HUD DO SO) ---
         this.montarBarraDeTarefasDoUsuario();
 
-        // Permite pressionar "Enter" ou "Espaço" no teclado como atalho opcional
+        // --- 6. MAPEAMENTO DE ENTRADAS DE TECLADO ---
         this.input.keyboard.on('keydown-ENTER', () => this.goToGoodEnding());
         this.input.keyboard.on('keydown-SPACE', () => this.goToGoodEnding());
 
@@ -94,22 +89,19 @@ export class WinScreen extends Phaser.Scene {
     montarBarraDeTarefasDoUsuario() {
         const camera = this.cameras.main;
         
-        // === CONTROLE DE ESCALA DA BARRA ===
+        // Configuração de Escala da Barra
         this.barHReal = camera.height > 600 ? 60 : 45; 
         
-        // Base azul royal da barra do Windows XP
         let baseBarra = this.add.graphics();
         baseBarra.fillStyle(0x245edb, 1);
         baseBarra.fillRect(0, camera.height - this.barHReal, camera.width, this.barHReal);
         
-        // Linha de brilho 3D superior da barra
         baseBarra.fillStyle(0x427bf4, 1);
         baseBarra.fillRect(0, camera.height - this.barHReal, camera.width, 4);
 
-        // Define a altura base central da barra para os botões alinharem
         const worldY = camera.height - (this.barHReal / 2);
 
-        // === BOTÃO START AMPLIADO ===
+        // Configuração Estética do Botão Start
         const startX = 110; 
         const startWidth = 120; 
         const startHeight = this.barHReal - 30; 
@@ -136,7 +128,7 @@ export class WinScreen extends Phaser.Scene {
         this.btnStart.on('pointerout', () => this.btnStart.setFillStyle(0x388A34));   
         this.btnStart.on('pointerdown', () => this.btnStart.setFillStyle(0x286325));  
 
-        // === ÁREA DO RELÓGIO (TRAY) AMPLIADA ===
+        // Configuração Estética do Sistema Tray (Relógio / Pontuação)
         const trayWidth = 200; 
         const trayX = camera.width - (trayWidth / 2); 
         const trayHeight = this.barHReal;
@@ -154,6 +146,7 @@ export class WinScreen extends Phaser.Scene {
     }
 
     goToGoodEnding() {
+        // --- 7. TRANSIÇÃO DE SAÍDA SEGURA ---
         if (this.cameras.main.fadeEffect.isRunning) return;
 
         this.sound.stopAll();

@@ -9,54 +9,56 @@ export class Preloader extends Scene
 
     init ()
     {
-        //  We loaded this image in our Boot Scene, so we can display it here
+        // --- 1. RENDERIZAÇÃO DA BARRA DE PROGRESSO INICIAL ---
         this.add.image(512, 384, 'background');
 
-        //  A simple progress bar. This is the outline of the bar.
+        // Contorno da barra de carregamento
         this.add.rectangle(512, 384, 468, 32).setStrokeStyle(1, 0xffffff);
 
-        //  This is the progress bar itself. It will increase in size from the left based on the % of progress.
+        // Preenchimento dinâmico da barra
         const bar = this.add.rectangle(512-230, 384, 4, 28, 0xffffff);
 
-        //  Use the 'progress' event emitted by the LoaderPlugin to update the loading bar
+        // Ouvinte do evento de progresso do LoaderPlugin
         this.load.on('progress', (progress) => {
-
-            //  Update the progress bar (our bar is 464px wide, so 100% = 464px)
             bar.width = 4 + (460 * progress);
-
         });
     }
 
     preload ()
     {
-        //  Load the assets for the game - Replace with your own assets
+        // --- 2. CONFIGURAÇÃO DO CAMINHO DOS ASSETS ---
         this.load.setPath('assets');
 
-        //Sprites
+        // --- 3. CARREGAMENTO DE TEXTURAS E SPRITES DO MAPA/UI ---
         this.load.image('menu', 'mapa/Menu.png');
         this.load.image('avatar', 'mapa/Avatar.png');
         this.load.image('logo_winxp', 'mapa/Logo_winxp.png');
         this.load.image('on_button', 'mapa/ON_Sprite.png');
         this.load.image('meu-wallpaper', 'mapa/background.jpg');
         this.load.image('logo', 'logo.png'); 
-        this.load.image('spr_clicker', 'defesas/Clicker_Sprite.png');
-        this.load.image('spr_lixeira', 'defesas/Trashcan_Sprite.png');
-        this.load.image('spr_firewall', 'defesas/Firewall_Sprite.png');
-        this.load.spritesheet('spr_worm', 'inimigos/Worm_Sprite.png', { 
-            frameWidth: 16, 
-            frameHeight: 16 
-        });
-        this.load.image('spr_letter', 'inimigos/Letter_Sprite.png');
-        this.load.image('spr_trojan', 'inimigos/Trojan_Sprite.png');
+        this.load.image('processador', 'mapa/processador.png');
+        this.load.image('pointer-icon', 'mapa/pointer.png');
+        this.load.image('game_background', 'mapa/BackgroundGame.gif');
+        
         this.load.spritesheet('spr_folder', 'mapa/Folder_Sprite.png', { 
             frameWidth: 32, 
             frameHeight: 32 
         });
 
-        this.load.image('processador', 'mapa/processador.png');
+        // --- 4. CARREGAMENTO DE ENTIDADES E DEFESAS ---
+        this.load.image('spr_clicker', 'defesas/Clicker_Sprite.png');
+        this.load.image('spr_lixeira', 'defesas/Trashcan_Sprite.png');
+        this.load.image('spr_firewall', 'defesas/Firewall_Sprite.png');
 
-        this.load.image('pointer-icon', 'mapa/pointer.png');
+        // --- 5. CARREGAMENTO DE INIMIGOS (VÍRUS) ---
+        this.load.image('spr_letter', 'inimigos/Letter_Sprite.png');
+        this.load.image('spr_trojan', 'inimigos/Trojan_Sprite.png');
+        this.load.spritesheet('spr_worm', 'inimigos/Worm_Sprite.png', { 
+            frameWidth: 16, 
+            frameHeight: 16 
+        });
 
+        // --- 6. CARREGAMENTO DAS ANIMAÇÕES DO JOGADOR ---
         this.load.spritesheet('player_attack', 'player/attack.png', {
             frameWidth: 24,  
             frameHeight: 24
@@ -74,14 +76,12 @@ export class Preloader extends Scene
             frameHeight: 24
         });
 
-        this.load.image('game_background', 'mapa/BackgroundGame.gif');
-
-        //Cutscenes
+        // --- 7. CARREGAMENTO DE QUADRINHOS (CUTSCENES) ---
         this.load.image('introducao_cutscene', 'cutscenes/Introducao_cutscene.jpeg');
         this.load.image('bad_ending_cutscene', 'cutscenes/Bad_ending_cutscene.jpeg');
         this.load.image('good_ending_cutscene', 'cutscenes/Good_ending_cutscene.jpeg');
 
-        // Efeitos sonoros 
+        // --- 8. CARREGAMENTO DE EFEITOS SONOROS E TRILHAS (ÁUDIOS) ---
         this.load.audio('key', 'audios/key.wav');
         this.load.audio('TurnOn', 'audios/TurnOn.mp3');
         this.load.audio('Start', 'audios/Startup.wav');
@@ -100,12 +100,10 @@ export class Preloader extends Scene
         this.load.audio('som_vitoria', 'audios/WinSound.mp3');
         this.load.audio('Error', 'audios/Error.mp3');
     }   
+
     create ()
     {
-        //  When all the assets have loaded, it's often worth creating global objects here that the rest of the game can use.
-        //  For example, you can define global animations here, so we can use them in other scenes.
-
-        //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
+        // --- 9. TRANSIÇÃO DE ENTRADA DO MENU ---
         this.scene.start('MainMenu');
     }
 }

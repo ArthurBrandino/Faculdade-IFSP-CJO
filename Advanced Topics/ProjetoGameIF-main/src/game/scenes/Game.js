@@ -27,37 +27,35 @@ export class Game extends Scene {
     }
 
     create() {
-        // --- 0. BACKGROUND DINÂMICO ESTILO MATRIX ---
+        // --- 1. CONFIGURAÇÃO DO PLANO DE FUNDO (CIBERESPAÇO) ---
         this.backgroundCyber = this.add.tileSprite(0, 0, 2000, 2000, 'game_background');
         this.backgroundCyber.setOrigin(0, 0);
         this.backgroundCyber.setDepth(-1); 
         this.backgroundCyber.tileScaleX = 1;
         this.backgroundCyber.tileScaleY = 1;
 
-        // 1. ESTADO INICIAL
+        // --- 2. SISTEMA DE ECONOMIA E SLOT INICIAL ---
         this.bits = 0;
         this.selecionada = 1;
         this.dadosDefesas = this.configurarDadosDefesas();
 
-        // 2. CONFIGURAÇÃO DO MUNDO FÍSICO
+        // --- 3. CONFIGURAÇÃO DA FÍSICA E GRUPOS ---
         this.physics.world.setBounds(0, 0, 2000, 2000);
-        
-        // 3. GRUPOS
         this.inimigos = this.physics.add.group({ runChildUpdate: true });
         this.defesas = this.add.group({ runChildUpdate: true });
 
-        // 4. ENTIDADES PRINCIPAIS
+        // --- 4. INSTANCIAÇÃO DAS ENTIDADES PRINCIPAIS ---
         this.enzinho = new Player(this, 1100, 1100);
         this.processador = new Processador(this, 1000, 1000);
         this.physics.add.collider(this.enzinho, this.processador);
 
-        // 5. PREVIEW DE CONSTRUÇÃO (Gráficos)
+        // --- 5. ELEMENTOS GRÁFICOS DO PREVIEW DE CONSTRUÇÃO ---
         this.previewRange = this.add.graphics().setDepth(99).setVisible(false);
         this.previewPreco = this.add.text(0, 0, '', {
             fontSize: '16px', fill: '#ffffff', stroke: '#000000', strokeThickness: 3, fontWeight: 'bold'
         }).setOrigin(0.5, 2.5).setDepth(101).setVisible(false);
 
-        // 6. INICIALIZAÇÃO DOS GERENCIADORES
+        // --- 6. INICIALIZAÇÃO DOS GERENCIADORES E ARQUITETURA ---
         this.combatManager = new CombatManager(this);
         this.buildManager = new BuildManager(this);
         this.uiManager = new UIManager(this); 
@@ -66,41 +64,11 @@ export class Game extends Scene {
         this.waveManager = new WaveManager(this, WAVES); 
         this.waveManager.iniciarSistema();
 
-        // 7. CÂMERA SEGUIR JOGADOR
+        // --- 7. CONTROLE DE CÂMERA ---
         this.cameras.main.setBounds(0, 0, 2000, 2000);
         this.cameras.main.startFollow(this.enzinho, true);
 
-        // 8. ESCUTA DE TECLAS DE ATALHO (SLOTS)
-        this.input.keyboard.on('keydown', (event) => {
-            const num = parseInt(event.key);
-            if (num >= 1 && num <= 4) {
-                this.uiManager.selecionarSlot(num);
-            }
-        });
-
-        // =====================================================================
-        // NOVO: GERENCIADOR DE CLIQUES PARA DISPARAR O ATAQUE VISUAL
-        // =====================================================================
-        this.input.on('pointerdown', (pointer) => {
-            // Só ataca se o slot selecionado for o 1 (Ação / Combate)
-            if (this.selecionada === 1) {
-                
-                // Converte a posição do clique na tela para coordenadas reais do mapa do jogo
-                const worldPoint = pointer.positionToCamera(this.cameras.main);
-                
-                // Dispara o método de ataque do jogador passando as listas necessárias
-                // para sua lógica de colisão/dano futura
-                this.enzinho.atacar(worldPoint, this.inimigos, this.defesas);
-                
-                // Opcional: Se você quiser rodar funções extras de dano direto do CombatManager
-                if (this.combatManager && typeof this.combatManager.processarCliqueAtaque === 'function') {
-                    this.combatManager.processarCliqueAtaque(worldPoint);
-                }
-            }
-        });
-        // =====================================================================
-
-        // --- AJUSTE DA TRILHA RETRÔ COORDENADA ---
+        // --- 8. GERENCIAMENTO DA TRILHA SONORA RETRÔ ---
         this.bgmOnda = this.sound.add('soundtrack', {
             loop: true,
             volume: 0.35 
@@ -115,7 +83,7 @@ export class Game extends Scene {
         }
     }
 
-
+    // --- 9. TABELA DE PROPRIEDADES DAS DEFESAS ---
     configurarDadosDefesas() {
         return {
             1: { nome: 'Combate', modo: 'acao' },
@@ -125,12 +93,10 @@ export class Game extends Scene {
         };
     }
 
+    // --- 10. INTERPOLAÇÃO VISUAL DE ALERTA ---
     mudarMatrizBackground() {
         const progressoCor = { valor: 0 };
-        const corOriginal = Phaser.Display.Color.HexStringToColor('#ffffff'); // Branco normal
-        
-        // MUDANÇA AQUI: Usamos um vermelho super saturado/neon com alta luminosidade nos outros canais
-        // Em vez de puxar para o escuro, isso força o Phaser a clarear os pixels
+        const corOriginal = Phaser.Display.Color.HexStringToColor('#ffffff'); 
         const corAlerta = Phaser.Display.Color.HexStringToColor('#ff0000');   
 
         this.tweens.add({
@@ -148,19 +114,19 @@ export class Game extends Scene {
                 const corHex = Phaser.Display.Color.GetColor(corMisturada.r, corMisturada.g, corMisturada.b);
                 
                 if (this.backgroundCyber) {
-                    // MUDANÇA AQUI: setTintFill ou setTintLight evitam o efeito "apagado" do setTint comum
-                    // Se o seu Sprite aceitar bem, o setTint normal com a cor '#ff8888' já vai clarear MUITO.
                     this.backgroundCyber.setTint(corHex);
                 }
             }
         });
     }
 
+    // --- 11. ATUALIZAÇÃO DO SISTEMA ECONÓMICO ---
     adicionarBits(valor) {
         this.bits += valor;
         this.uiManager.atualizarBits(this.bits);
     }
 
+    // --- 12. GERAÇÃO ALEATÓRIA DE INIMIGOS (BORDAS DO MAPA) ---
     spawnInimigo(classe) { 
         const margem = 100;
         const lado = Phaser.Math.Between(0, 3);
@@ -179,12 +145,13 @@ export class Game extends Scene {
         }
     }
 
+    // --- 13. LOOP DE EXECUÇÃO PRINCIPAL (TICK RATE) ---
     update() {
         if (this.enzinho?.update) this.enzinho.update();
         
         if (this.backgroundCyber) {
-            this.backgroundCyber.tilePositionY -= 1.7; // Move para cima bem suave
-            this.backgroundCyber.tilePositionX += 0.4; // Desloca de leve para o lado
+            this.backgroundCyber.tilePositionY -= 1.7; 
+            this.backgroundCyber.tilePositionX += 0.4; 
         }
 
         this.buildManager.atualizarPreview(
