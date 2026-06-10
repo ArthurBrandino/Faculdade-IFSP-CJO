@@ -1,7 +1,7 @@
 import { Defesa } from './Defesa.js';
-import { Worm } from "../entities/Worm.js";
 
 export class Lixeira extends Defesa {
+    // --- 1. PROPRIEDADES ESTÁTICAS DE BALANCEAMENTO ---
     static get CUSTO() { return 200; }
     static get RANGE() { return 300; }
     static get LARGURA() { return 100; }
@@ -28,15 +28,14 @@ export class Lixeira extends Defesa {
         this.ocupado = false;
         this.cronometro = 0;
         
-        // Guarda as escalas originais para os Tweens de impacto não quebrarem o tamanho do sprite
+        // Cache de escala para mitigar artefatos visuais ou quebras de tamanho pós-tweens
         this.escalaOriginalX = this.scaleX;
         this.escalaOriginalY = this.scaleY;
 
-        // --- AUDIO CONFIG ---
-        // Instancia o som de processamento com loop para o caso do tempo de taxa de tiro ser longo
         this.somProcessando = this.scene.sound.add('TrashProcessing', { loop: true, volume: 0.3 });
     }
 
+    // --- 2. MÁQUINA DE ESTADO E ATUALIZAÇÃO LOGÍSTICA ---
     update(time, delta) {
         if (!this.ocupado) {
             this.capturar(time);
@@ -44,33 +43,39 @@ export class Lixeira extends Defesa {
         } else {
             this.cronometro += delta;
 
+            // Tratamento de exceção: Se o alvo foi expurgado por outra entidade externa
             if (!this.alvoPreso || !this.alvoPreso.active) {
                 this.resetarLixeira(); 
                 return;
             }
 
+            // Cálculo proporcional de decaimento de integridade do vírus (DPS)
             this.dano = this.alvoPreso.hp / Lixeira.TAXA_TIRO;
             this.alvoPreso.receberDano(this.dano);
 
+            // Condicional de expurgo finalizado por exaustão de tempo ou HP zerado
             if (this.cronometro >= Lixeira.TAXA_TIRO || this.alvoPreso.hp <= 0) {
                 this.alvoPreso.morrer(false);
-                this.finalizarFeedback(); // Aqui para o som de processamento e toca o complete
+                this.finalizarFeedback(); 
                 this.resetarLixeira();
             }
         }
     }
 
+    // --- 3. MECÂNICA DE INTERCEPÇÃO E RETENÇÃO DE IA ---
     capturar(time) {
         const alvo = this.procurarAlvo();
         if (alvo) {
             this.alvoPreso = alvo; 
             this.alvoPreso.estaPreso = true;
 
+            // Delegação de hierarquia: Evita quebras de cadeia caso o vírus seja uma Worm articulada
             if (typeof this.alvoPreso.promoverProximoSegmento === 'function') {
                 console.log("Promovendo novo líder para o Worm...");
                 this.alvoPreso.promoverProximoSegmento(); 
             }
 
+            // Ocultamento visual e desativação do motor físico do alvo contido
             this.alvoPreso.visible = false;
             this.alvoPreso.body.enable = false;
             this.ocupado = true; 
@@ -80,14 +85,12 @@ export class Lixeira extends Defesa {
         }
     }
 
+    // --- 4. SOBRECARGA DE DANOS E EXPULSÃO DE SEGURANÇA ---
     receberDano(quantidade) {
-        // Aplica o dano usando a lógica da classe pai (Defesa)
         super.receberDano(quantidade);
         
-        // Se a lixeira zerar os pontos de vida (hp ou vida, dependendo de como está na classe pai)
         if (this.hp <= 0) {
-            
-            // Se ela continha um monstro preso, cospe o bicho de volta no mapa antes de sumir
+            // Ejeção de emergência: cospe o bicho de volta ao tabuleiro se a lixeira colapsar
             if (this.ocupado && this.alvoPreso && this.alvoPreso.active) {   
                 this.alvoPreso.setPosition(this.x, this.y);
                 this.alvoPreso.visible = true;
@@ -97,23 +100,23 @@ export class Lixeira extends Defesa {
                 this.alvoPreso.estaPreso = false;
             }
             
-            // Para o áudio imediatamente para não ficar tocando em loop no limbo
+            // Garbage Collection preventiva de instâncias de áudio em loop
             if (this.somProcessando) {
                 if (this.somProcessando.isPlaying) {
                     this.somProcessando.stop();
                 }
-                this.somProcessando.destroy(); // Remove o áudio da memória do gerenciador de som
+                this.somProcessando.destroy(); 
             }
 
             if (this.tweenProcessando) {
                 this.tweenProcessando.stop();
             }
             
-            // ATENÇÃO: Usa o método padrão do Phaser para deletar o objeto de vez
             this.destroy();
         }
     }
 
+    // --- 5. REDEFINIÇÃO DE PARÂMETROS E LIMPEZA DE CICLO ---
     resetarLixeira() {
         this.alvoPreso = null;
         this.cronometro = 0;
@@ -124,7 +127,6 @@ export class Lixeira extends Defesa {
             this.tweenProcessando = null;
         }
 
-        // Garante que o som pare caso o inimigo saia ou quebre por outro motivo externo
         if (this.somProcessando && this.somProcessando.isPlaying) {
             this.somProcessando.stop();
         }
@@ -133,15 +135,13 @@ export class Lixeira extends Defesa {
         this.setScale(this.escalaOriginalX, this.escalaOriginalY); 
     }
 
-    //============================================================ Visual e Sonoro ===========================================
-
+    // --- 6. INTERFACE GRÁFICA E FEEDBACK DE ANIMAÇÃO (TWEENS) ---
     capturarFeedback() {
-        // --- ÁUDIO: Inicia o som de trituração/deletando ---
         if (this.somProcessando && !this.somProcessando.isPlaying) {
             this.somProcessando.play();
         }
 
-        // 1. Efeito de Tremor mecânico enquanto deleta
+        // Tween A: Oscilação angular contínua para simular trituração/compressão mecânica
         this.tweenProcessando = this.scene.tweens.add({
             targets: this,
             angle: { from: -6, to: 6 }, 
@@ -150,7 +150,7 @@ export class Lixeira extends Defesa {
             yoyo: true
         });
 
-        // 2. Efeito de "Squeeze" (Esmagar de leve ao engolir o vírus)
+        // Tween B: Efeito de esmagamento elástico imediato (Squash & Stretch)
         this.scene.tweens.add({
             targets: this,
             scaleX: this.escalaOriginalX * 1.3, 
@@ -162,7 +162,6 @@ export class Lixeira extends Defesa {
     }
 
     finalizarFeedback() {
-        // --- ÁUDIO: Para a trituração e toca o aviso de concluído (Lixeira Esvaziada) ---
         if (this.somProcessando && this.somProcessando.isPlaying) {
             this.somProcessando.stop();
         }
@@ -174,7 +173,7 @@ export class Lixeira extends Defesa {
         }
         this.setAngle(0);
 
-        // 3. Efeito Pop (Sinalizando que terminou de esvaziar/deletar)
+        // Tween C: Efeito óptico Pop para sinalizar a conclusão do expurgo de dados
         this.scene.tweens.add({
             targets: this,
             scaleX: this.escalaOriginalX * 1.4,

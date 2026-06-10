@@ -2,7 +2,8 @@ import { Inimigo } from "./Virus";
 import { Worm } from "./Worm";
 
 export class Trojan extends Inimigo {
-    constructor(scene, x, y){
+    // --- 1. CONSTRUTOR E PARAMETRIZAÇÃO DE ATRIBUTOS ---
+    constructor(scene, x, y) {
         const velocidade = 60;
         const vida = 40;
         const dano = 10;
@@ -12,30 +13,29 @@ export class Trojan extends Inimigo {
         const amplitude = 0;
 
         super(scene, x, y, largura, altura, 'spr_trojan', vida, velocidade, dano, frequencia, amplitude);
-        
     }
 
+    // --- 2. CICLO DE PRÉ-RENDERIZAÇÃO E ORIENTAÇÃO DE FLIP ---
     preUpdate(time, delta) {
         super.preUpdate(time, delta);
 
-        // Verifica a velocidade no corpo físico
+        // Atualização dinâmica baseada no vetor de velocidade do motor físico
         if (this.body) {
             if (this.body.velocity.x > 0) {
-                // Se a velocidade X é positiva, ele vai para a direita
                 this.setFlipX(false); 
             } else if (this.body.velocity.x < 0) {
-                // Se a velocidade X é negativa, ele vai para a esquerda (Inverte o sprite)
                 this.setFlipX(true); 
             }
         }
     }
 
+    // --- 3. ROTINA DE DESTRUIÇÃO E INJEÇÃO DE ENTIDADES FILHAS (SPAWN) ---
     morrer(gerarFilhos = true) {
-        if(gerarFilhos)
-        {
+        if (gerarFilhos) {
             let quantidade = Phaser.Math.Between(2, 4);
+            
             for (let i = 0; i < quantidade; i++) {
-                
+                // Cálculo de dispersão radial para evitar sobreposição imediata de hitboxes
                 const offsetX = Phaser.Math.Between(-30, 30);
                 const offsetY = Phaser.Math.Between(-30, 30);
 
@@ -45,13 +45,13 @@ export class Trojan extends Inimigo {
                     this.y + offsetY
                 );
             
+                // Alocação da nova instância no barramento global de colisões da cena ativa
                 if (this.scene.inimigos) {
                     this.scene.inimigos.add(wormFilho);
-
-                    
                 }
             }
         }
+        
         super.morrer(gerarFilhos);
     }
 }

@@ -1,7 +1,8 @@
 import { Inimigo } from "./Virus";
 
 export class ILY extends Inimigo {
-    constructor(scene, x, y){
+    // --- 1. CONSTRUTOR E PARAMETRIZAÇÃO DE ATRIBUTOS ---
+    constructor(scene, x, y) {
         const velocidade = 70;
         const vida = 15; 
         const dano = 20;
@@ -12,17 +13,20 @@ export class ILY extends Inimigo {
 
         super(scene, x, y, largura, altura, 'spr_letter', vida, velocidade, dano, frequencia, amplitude);
         
-     
-        this.alvejavel = false; // Indica para o sistema de mira que este monstro deve ser ignorado
+        // Flag de exceção: Sinaliza ao barramento de Defesa para ignorar esta instância nas varreduras de mira
+        this.alvejavel = false; 
     }
 
-    // Mantemos a segurança: se algo ainda conseguir bater nele por erro, ele não toma dano
+    // --- 2. EXCEÇÃO DE INTERAÇÃO (IMUNIDADE ABSOLUTA) ---
     receberDano(quantidade) {
+        // Bloqueio de pipeline de dano: Garante imunidade caso seja interceptado por colisões ou projéteis alternativos
         return; 
     }
 
+    // --- 3. COMPORTAMENTO DE IMPACTO E DESALOCAÇÃO ---
     explodir(alvo, dano) {
-        alvo.receberDano(dano); // Hitkill na construção que ele tocou
+        // Aplicação direta de dano massivo (Hitkill) ao interceptar uma barreira/defesa no tabuleiro
+        alvo.receberDano(dano); 
         this.destroy(); 
     }
 }

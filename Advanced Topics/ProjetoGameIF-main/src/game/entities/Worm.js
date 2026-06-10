@@ -1,8 +1,8 @@
 import { Inimigo } from "./Virus";
 
 export class Worm extends Inimigo {
+    // --- 1. CONSTRUTOR E PARAMETRIZAÇÃO INDIVIDUAL DE SEGMENTOS ---
     constructor(scene, x, y, ehSegmento = false) {
-        // Atributos base
         const velocidade = 150;
         const vida = 1;
         const dano = 1; 
@@ -13,16 +13,15 @@ export class Worm extends Inimigo {
 
         super(scene, x, y, largura, altura, 'spr_worm', vida, velocidade, dano, frequencia, amplitude);
 
-        
         this.cauda = []; 
         this.ehSegmento = ehSegmento; 
 
+        // Configuração de ramificação de comportamento (Cabeça Líder vs Segmento Rastreador)
         if (!ehSegmento) {
             this.setFrame(3);
             this.historicoPosicoes = [];
             this.adicionarSegmentos(4);
-        }
-        else{
+        } else {
             this.setFrame(2);
             this.tornarImortal();
         }
@@ -30,46 +29,50 @@ export class Worm extends Inimigo {
         this.setDisplaySize(altura, largura);
     }
 
-
+    // --- 2. CONFIGURAÇÕES DE REGRAS DE INTERAÇÃO E MOTOR FÍSICO ---
     tornarImortal() {
-        this.disableInteractive(); // Não aceita cliques
+        this.disableInteractive(); 
         if (this.body) {
-            this.body.enable = false; // Desativa física (não colide com nada)
+            this.body.enable = false; 
         }
     }
 
     tornarVulneravel() {
-        this.setInteractive(); // Volta a aceitar cliques
+        this.setInteractive(); 
         if (this.body) {
-            this.body.enable = true; // Ativa física (pode bater no processador)
+            this.body.enable = true; 
         }
-        this.setAlpha(1); // Fica sólido
+        this.setAlpha(1); 
     }
 
+    // --- 3. ALOCAÇÃO DINÂMICA DE FILHOS E ENCADEAMENTO ---
     adicionarSegmentos(quantidade) {
         for (let i = 0; i < quantidade; i++) {
             const novoSegmento = new Worm(this.scene, this.x, this.y, true);
             
-            this.scene.inimigos.add(novoSegmento);
+            if (this.scene.inimigos) {
+                this.scene.inimigos.add(novoSegmento);
+            }
             this.cauda.push(novoSegmento);
         }
     }
 
+    // --- 4. SISTEMA DE FILTRO DE ATUALIZAÇÃO E RASTRO POR BUFFER (SNAKE RENDER) ---
     preUpdate(time, delta) {
-        // Apenas a cabeça processa a lógica de movimento do Virus.js
+        // Apenas a cabeça processa a inteligência artificial de perseguição de Virus.js
         if (!this.ehSegmento) {
             super.preUpdate(time, delta);
 
-            // Guarda a posição atual
+            // Injeta a coordenada atual no topo do array (Buffer de Rastro)
             this.historicoPosicoes.unshift({ x: this.x, y: this.y });
 
-            // Limpa o histórico antigo para não pesar (tamanho da cauda * delay)
+            // Garbage Collection preventiva do histórico para mitigar vazamento de memória
             if (this.historicoPosicoes.length > 100) {
                 this.historicoPosicoes.pop();
             }
 
-            // Faz a cauda seguir o rastro com um "delay" de frames
-            const espacamento = 6; // Quantos frames de atraso entre cada bloco
+            // Atualização de arrasto: Desloca cada segmento com um atraso fixo de iterações
+            const espacamento = 6; 
             this.cauda.forEach((seg, index) => {
                 const indiceNoHistorico = (index + 1) * espacamento;
                 const posAntiga = this.historicoPosicoes[indiceNoHistorico];
@@ -82,11 +85,13 @@ export class Worm extends Inimigo {
         }
     }
 
+    // --- 5. ELEVAÇÃO DE COMPONENTES E PASSAGEM DE REFERÊNCIA (PROMOÇÃO DE LÍDER) ---
     promoverProximoSegmento(alvo = null) {
         if (this.estaMorrendo) return;
         this.estaMorrendo = true;
 
         if (this.cauda && this.cauda.length > 0) {
+            // Extrai o primeiro elemento da fila para herdar o controle da entidade
             const novaCabeca = this.cauda.shift();
 
             if (novaCabeca && novaCabeca.active) {
@@ -96,7 +101,7 @@ export class Worm extends Inimigo {
                 novaCabeca.ehSegmento = false;
                 novaCabeca.tornarVulneravel();
 
-                // Se o alvo for o processador, a nova cabeça assume a posição da antiga
+                // Teleporte de emergência caso a colisão ocorra diretamente no Processador central
                 if (alvo === this.scene.processador) {
                     novaCabeca.x = this.x;
                     novaCabeca.y = this.y;
@@ -106,17 +111,16 @@ export class Worm extends Inimigo {
         this.cauda = [];
     }
 
-   aoColidir(alvo) {
+    // --- 6. PROCESSAMENTO DE IMPACTOS, FEEDBACKS E DESTRUIÇÃO ---
+    aoColidir(alvo) {
         if (this.estaMorrendo) return;
 
         if (alvo && alvo.receberDano) {
-            const hpAntes = alvo.hp;
-            
             alvo.receberDano(this.dano, this);
 
+            // Mecânica Vampírica: Se a colisão obliterar uma defesa ordinária, a Worm expande
             if (alvo.hp <= 0 && alvo !== this.scene.processador) {
                 console.log("Worm devorou a defesa e cresceu!");
-                
                 if (this.cauda.length > 0) {
                     this.adicionarSegmentos(5); 
                 }
@@ -131,19 +135,15 @@ export class Worm extends Inimigo {
         this.hp -= quantidade;
         
         if (this.hp <= 0 && !this.estaMorrendo) {
-            // Se morreu por tiro, tentamos promover a cauda ANTES de destruir
             this.promoverProximoSegmento(); 
             this.morrer();
         }
     }
 
     morrer() {
-       if (this.cauda.length === 0 && this.ehSegmento === false) {
+        if (this.cauda.length === 0 && this.ehSegmento === false) {
             console.log("Worm totalmente eliminado!");
         }
-        
-        // Deletamos a cabeça atual, mas o objeto 'novaCabeca' 
-        // já recebeu a referência da lista 'cauda' no aoColidir ou aqui
         super.morrer();
     }
 }

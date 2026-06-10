@@ -1,8 +1,12 @@
+// =====================================================================
+// --- CONFIGURAÇÃO GLOBAL DE BALANCEAMENTO E RITMO DE ONDAS (WAVES) ---
+// =====================================================================
 export const WAVES = [
+    // --- 1. INTRODUÇÃO E CURVA DE APRENDIZADO ---
     {
         id: 1,
-        safeTime: 5000,   // 5 segundos de paz
-        dangerTime: 15000, // 15 segundos nascendo bicho
+        safeTime: 5000,   
+        dangerTime: 15000, 
         inimigos: [
             { classe: 'Worm', quantidade: 10, intervalo: 1000 }
         ],
@@ -18,29 +22,30 @@ export const WAVES = [
         ],
         pastasParaCriar: 4
     },
-    // --- WAVE 3: Introdução do ILY (O rolo compressor lento) ---
+
+    // --- 2. INTRODUÇÃO DE MECÂNICAS ESPECÍFICAS (FIREWALL & CLICKER) ---
     {
         id: 3,
         safeTime: 8000,
         dangerTime: 25000,
         inimigos: [
-            { classe: 'ILY', quantidade: 2, intervalo: 8000 }, // Jogador PRECISA comprar Firewall aqui
+            { classe: 'ILY', quantidade: 2, intervalo: 8000 }, 
             { classe: 'Worm', quantidade: 8, intervalo: 1500 }
         ],
         pastasParaCriar: 3
     },
-    // --- WAVE 4: O Combo do Trojan (Esponja de Clicker) ---
     {
         id: 4,
         safeTime: 10000,
         dangerTime: 30000,
         inimigos: [
-            { classe: 'Trojan', quantidade: 5, intervalo: 4000 }, // Vai testar os Clickers e soltar muitos Worms ao morrer
-            { classe: 'Worm', quantidade: 12, intervalo: 1000 }
+            { classe: 'Trojan', quantidade: 5, intervalo: 4000 }, 
+            { classe: 'Worm', quantity: 12, intervalo: 1000 }
         ],
         pastasParaCriar: 5
     },
-    // --- WAVE 5: Pressão de Linha (ILY Avançando com Escolta) ---
+
+    // --- 3. PRESSÃO COMBINADA E RITMO DE ENXAME (LIXEIRA) ---
     {
         id: 5,
         safeTime: 10000,
@@ -52,18 +57,17 @@ export const WAVES = [
         ],
         pastasParaCriar: 6
     },
-    // --- WAVE 6: Teste da Lixeira (O Enxame de Worms) ---
     {
         id: 6,
         safeTime: 12000,
         dangerTime: 40000,
         inimigos: [
-            // Uma enxurrada de Worms vindo muito rápido para forçar dano em área (Lixeira)
             { classe: 'Worm', quantidade: 35, intervalo: 400 } 
         ],
         pastasParaCriar: 5
     },
-    // --- WAVE 7: Divisão de Atenção (Trojan + ILY juntos) ---
+
+    // --- 4. EXCEÇÃO DE MEMÓRIA E DIVISÃO DE ATENÇÃO ---
     {
         id: 7,
         safeTime: 12000,
@@ -74,7 +78,6 @@ export const WAVES = [
         ],
         pastasParaCriar: 8
     },
-    // --- WAVE 8: Inundação de Memória ---
     {
         id: 8,
         safeTime: 15000,
@@ -86,27 +89,27 @@ export const WAVES = [
         ],
         pastasParaCriar: 7
     },
-    // --- WAVE 9: Corrida do Ouro (Muito bicho rápido, pouca vida) ---
+
+    // --- 5. CLÍMAX E APOCALIPSE FINAL DE SISTEMA ---
     {
         id: 9,
         safeTime: 15000,
         dangerTime: 45000,
         inimigos: [
-            { classe: 'Worm', quantidade: 50, intervalo: 300 }, // Metralhadora de Worms
+            { classe: 'Worm', quantidade: 50, intervalo: 300 }, 
             { classe: 'ILY', quantidade: 2, intervalo: 10000 }
         ],
         pastasParaCriar: 10
     },
-    // --- WAVE 10: APOCALIPSE DO SISTEMA (O Teste Estresse Final) ---
     {
         id: 10,
         safeTime: 20000,
         dangerTime: 60000,
         inimigos: [
-            { classe: 'ILY', quantidade: 8, intervalo: 3000 },     // Destruidores constantes
-            { classe: 'Trojan', quantidade: 10, intervalo: 2500 },  // Vão spawnar 30 Worms extras ao morrer!
-            { classe: 'Worm', quantidade: 40, intervalo: 400 }     // Caos na tela
+            { classe: 'ILY', quantidade: 8, intervalo: 3000 },     
+            { classe: 'Trojan', quantidade: 10, intervalo: 2500 },  
+            { classe: 'Worm', quantidade: 40, intervalo: 400 }     
         ],
-        pastasParaCriar: 15 // O mapa vai virar um lixão de pastas!
+        pastasParaCriar: 15 
     }
 ];

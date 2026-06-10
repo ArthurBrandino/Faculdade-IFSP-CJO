@@ -2,14 +2,19 @@ import Phaser from 'phaser';
 
 export class Player extends Phaser.Physics.Arcade.Sprite {
     constructor(scene, x, y) {
+        // Inicializa o sprite herdeiro com a textura padrão de repouso (idle)
         super(scene, x, y, 'player_idle', 0);
         
+        // Insere a instância na lista de renderização e no motor físico da cena ativa
         scene.add.existing(this);
         scene.physics.add.existing(this);
         
+        // Configurações de colisão com as bordas do mapa e propriedades de combate
         this.body.setCollideWorldBounds(true);
         this.speed = 300;
         this.danoAtaque = 1;
+
+        // Registro de entradas físicas (Teclado - Setas direcionais e WASD)
         this.cursors = scene.input.keyboard.createCursorKeys();
         this.teclasWASD = scene.input.keyboard.addKeys({
             up: Phaser.Input.Keyboard.KeyCodes.W,
@@ -18,16 +23,20 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
             right: Phaser.Input.Keyboard.KeyCodes.D
         });
 
+        // Configuração de dimensionamento e preservação de proporção para Pixel Art
         this.setScale(2.5); 
         this.setPixelArt = true; 
 
+        // Redefinição da Hitbox física interna (Caixa de colisão otimizada para os pés/base)
         this.body.setSize(14, 16);
         this.body.setOffset(5, 6);
 
+        // Armazenamento de estado de orientação do vetor e histórico de concorrência de cliques
         this.ultimaDirecaoX = 0;
         this.ultimaDirecaoY = 1; 
         this.ultimoCliqueTempo = 0;
 
+        // Inicialização do catálogo de spritesheets e reprodução do estado inicial
         this.configurarAnimacoes(scene);
 
         if (scene.anims.exists('player_idle_down')) {
@@ -35,8 +44,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
+    // --- MÁQUINA DE ANIMAÇÃO: MAPEAMENTO DE FRAMES DAS SPRITESHEETS ---
     configurarAnimacoes(scene) {
-        // --- IDLES ---
+        // --- IDLES (Estados de Repouso Estático) ---
         if (!scene.anims.exists('player_idle_down')) {
             scene.anims.create({ key: 'player_idle_down', frames: scene.anims.generateFrameNumbers('player_idle', { start: 0, end: 3 }), frameRate: 6, loop: -1 });
         }
@@ -47,7 +57,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
             scene.anims.create({ key: 'player_idle_up', frames: scene.anims.generateFrameNumbers('player_idle', { start: 16, end: 19 }), frameRate: 6, loop: -1 });
         }
 
-        // --- CORRIDAS ---
+        // --- CORRIDAS (Estados de Movimentação Dinâmica) ---
         if (!scene.anims.exists('player_run_down')) {
             scene.anims.create({ key: 'player_run_down', frames: scene.anims.generateFrameNumbers('player_run', { start: 0, end: 5 }), frameRate: 12, loop: -1 });
         }
@@ -58,7 +68,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
             scene.anims.create({ key: 'player_run_up', frames: scene.anims.generateFrameNumbers('player_run', { start: 24, end: 29 }), frameRate: 12, loop: -1 });
         }
 
-        // --- ATAQUES ---
+        // --- ATAQUES (Estados de Ação e Combate Ofensivo) ---
         if (!scene.anims.exists('player_attack_down')) {
             scene.anims.create({ key: 'player_attack_down', frames: scene.anims.generateFrameNumbers('player_attack', { start: 0, end: 5 }), frameRate: 14, loop: 0 });
         }
@@ -69,7 +79,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
             scene.anims.create({ key: 'player_attack_up', frames: scene.anims.generateFrameNumbers('player_attack', { start: 24, end: 29 }), frameRate: 14, loop: 0 });
         }
 
-        // --- INTERAÇÃO / CONSTRUÇÃO (Novas animações baseadas no Interact-Sheet) ---
+        // --- INTERAÇÕES (Estados de Mineração, Construção ou Coleta) ---
         if (!scene.anims.exists('player_interact_down')) {
             scene.anims.create({ key: 'player_interact_down', frames: scene.anims.generateFrameNumbers('player_interact', { start: 0, end: 3 }), frameRate: 12, loop: 0 });
         }
@@ -81,30 +91,32 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
+    // --- LOOP PRINCIPAL DE EXECUÇÃO (ATUALIZAÇÃO DE ESTADOS) ---
     update() {
+        // Trava de Animação Ativa: Interrompe a reavaliação de input se uma animação prioritária estiver rodando
+        if (this.anims.isPlaying && (this.anims.currentAnim.key.startsWith('player_attack') || this.anims.currentAnim.key.startsWith('player_interact'))) {
+            return; 
+        }
+
+        // Reseta as forças inerciais físicas antes do cálculo de movimentação do frame atual
         this.body.setVelocity(0);
         let moveX = 0;
         let moveY = 0;
 
+        // Leitura e armazenamento vetorial nos eixos X e Y
         if (this.cursors.left.isDown || this.teclasWASD.left.isDown)       moveX = -1;
         else if (this.cursors.right.isDown || this.teclasWASD.right.isDown) moveX = 1;
 
         if (this.cursors.up.isDown || this.teclasWASD.up.isDown)           moveY = -1;
         else if (this.cursors.down.isDown || this.teclasWASD.down.isDown)   moveY = 1;
 
+        // Aplicação das forças de velocidade no corpo físico do Arcade Physics
         if (moveX !== 0 || moveY !== 0) {
             this.body.setVelocityX(moveX * this.speed);
             this.body.setVelocityY(moveY * this.speed);
         }
 
-        // Se estiver atacando OU construindo, deixa a animação visual terminar antes de aplicar corrida/idle
-        if (this.anims.isPlaying && (this.anims.currentAnim.key.startsWith('player_attack') || this.anims.currentAnim.key.startsWith('player_interact'))) {
-            if (moveY !== 0) { this.ultimaDirecaoY = moveY; this.ultimaDirecaoX = 0; }
-            else if (moveX !== 0) { this.ultimaDirecaoX = moveX; this.ultimaDirecaoY = 0; }
-            return; 
-        }
-
-        // Máquina de estados padrão
+        // Árvore de Decisão Visual: Define e reproduz a animação correta com base no vetor de movimento
         if (moveY === 1) {
             this.play('player_run_down', true);
             this.ultimaDirecaoY = 1;
@@ -117,11 +129,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         } 
         else if (moveX !== 0) {
             this.play('player_run_side', true);
-            this.setFlipX(moveX === -1);
+            this.setFlipX(moveX === -1); // Inversão horizontal do sprite (Espelhamento para a esquerda)
             this.ultimaDirecaoX = moveX;
             this.ultimaDirecaoY = 0;
         } 
         else {
+            // Estrutura Fallback: Retorna o sprite para o estado Idle correspondente à última direção salva
             if (this.ultimaDirecaoY === 1)       this.play('player_idle_down', true);
             else if (this.ultimaDirecaoY === -1) this.play('player_idle_up', true);
             else if (this.ultimaDirecaoX !== 0) {
@@ -133,44 +146,53 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
         }
     }
 
-    atacar(worldPoint, listaInimigos, listaPastas) {
+    // --- GATILHO COMPORTAMENTAL: ATAQUE DIRECIONAL ---
+    atacar(worldPoint) {
+        // Amortecimento físico completo para evitar deslizamentos durante a conjuração do ataque
+        this.body.setVelocity(0);
+
+        // Sistema de Combo/Cadência: Calcula o tempo delta entre ativações consecutivas do mouse
         const tempoAtual = this.scene.time.now;
         const diferencaTempo = tempoAtual - this.ultimoCliqueTempo;
         this.ultimoCliqueTempo = tempoAtual;
 
+        // Escalonamento Dinâmico: Aumenta a velocidade de reprodução da animação (Time Scale) em cliques rápidos
         let escalaVelocidade = 1;
         if (diferencaTempo < 300) {
             escalaVelocidade = 1 + ((300 - diferencaTempo) / 250); 
             escalaVelocidade = Phaser.Math.Clamp(escalaVelocidade, 1, 1.8);
         }
 
+        // Trigonometria de Mira: Divide o espaço tridimensional em quadrantes angulares baseados no clique
         const angulo = Phaser.Math.Angle.Between(this.x, this.y, worldPoint.x, worldPoint.y);
         const graus = Phaser.Math.RadToDeg(angulo);
 
         let animAtaque = 'player_attack_down';
 
-        if (graus >= -135 && graus < -45)      animAtaque = 'player_attack_up';
+        // Mapeamento dos eixos angulares em graus para a troca direcional da animação gráfica
+        if (graus >= -135 && graus < -45)        animAtaque = 'player_attack_up';
         else if (graus >= 45 && graus < 135)   animAtaque = 'player_attack_down';
         else if (graus < -135 || graus >= 135) { animAtaque = 'player_attack_side'; this.setFlipX(true); }
-        else                                  { animAtaque = 'player_attack_side'; this.setFlipX(false); }
+        else                                   { animAtaque = 'player_attack_side'; this.setFlipX(false); }
 
+        // Execução da animação e injeção do modificador de velocidade de reprodução
         this.play(animAtaque, true);
         this.anims.timeScale = escalaVelocidade;
     }
 
-    // =====================================================================
-    // NOVO MÉTODO: DISPARA A ANIMAÇÃO DE CONSTRUÇÃO NA DIREÇÃO DO EVENTO
-    // =====================================================================
+    // --- GATILHO COMPORTAMENTAL: INTERAÇÃO / MINERAÇÃO ---
     interagir(worldPoint) {
-        // Redefine a escala de tempo para velocidade normal de construção (1.0)
+        // Estabilização da física inercial e restauração da escala de tempo padrão da animação
+        this.body.setVelocity(0);
         this.anims.timeScale = 1.0;
 
-        // Calcula para onde o jogador deve olhar baseado na posição da construção
+        // Mapeamento trigonométrico vetorial para determinar a rotação visual do player durante a ação
         const angulo = Phaser.Math.Angle.Between(this.x, this.y, worldPoint.x, worldPoint.y);
         const graus = Phaser.Math.RadToDeg(angulo);
 
         let animInteract = 'player_interact_down';
 
+        // Distribuição dos quadrantes de ação e cacheamento forçado das variáveis de última direção
         if (graus >= -135 && graus < -45) {
             animInteract = 'player_interact_up';
             this.ultimaDirecaoY = -1;
@@ -194,6 +216,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
             this.ultimaDirecaoY = 0;
         }
 
+        // Execução final da animação de interação baseada nas coordenadas obtidas
         this.play(animInteract, true);
     }
 }
